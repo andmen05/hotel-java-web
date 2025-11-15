@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <!-- Servlets -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ClienteServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.ClienteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClienteServlet</servlet-name>
+        <url-pattern>/clientes</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>HabitacionServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.HabitacionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HabitacionServlet</servlet-name>
+        <url-pattern>/habitaciones</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ReservaServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.ReservaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReservaServlet</servlet-name>
+        <url-pattern>/reservas</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>CheckInServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.CheckInServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CheckInServlet</servlet-name>
+        <url-pattern>/checkin</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ProductoServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.ProductoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductoServlet</servlet-name>
+        <url-pattern>/productos</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>VentaServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.VentaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VentaServlet</servlet-name>
+        <url-pattern>/ventas</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ReporteServlet</servlet-name>
+        <servlet-class>com.hotel.servlets.ReporteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReporteServlet</servlet-name>
+        <url-pattern>/reportes</url-pattern>
+    </servlet-mapping>
+</web-app>
+
