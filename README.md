@@ -1,173 +1,252 @@
 # 🏨 Sistema de Gestión Hotelero
 
-Un sistema completo de gestión hotelera desarrollado con **Java (JSP)**, **JavaScript** y **Tailwind CSS**. Diseñado para administrar habitaciones, reservas, clientes, check-ins, productos, ventas y reportes en tiempo real.
+Un sistema web integral para la administración completa de operaciones hoteleras. Desarrollado con **Java**, **JSP**, **Servlets** y **MySQL**, ofrece funcionalidades robustas para gestionar habitaciones, reservas, clientes, check-ins, productos y ventas en tiempo real.
+
+---
+
+## 📋 Tabla de Contenidos
+
+- [Características Principales](#-características-principales)
+- [Tecnologías](#-tecnologías)
+- [Requisitos](#-requisitos)
+- [Instalación](#-instalación)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Base de Datos](#-base-de-datos)
+- [Configuración](#-configuración)
+- [Funcionalidades por Página](#-funcionalidades-por-página)
+- [Troubleshooting](#-troubleshooting)
+- [Soporte](#-soporte)
+- [Autor](#-autor)
 
 ---
 
 ## ✨ Características Principales
 
-### 👥 Gestión de Usuarios
-- **Autenticación segura** con sesiones
-- **Perfil de usuario** con foto personalizada
-- **Cambio de contraseña** seguro
-- **Actividad reciente** en tiempo real
-- **Avatar global** sincronizado en todas las páginas
+### 🔐 Autenticación y Usuarios
+- Sistema de login con sesiones HTTP
+- Tres roles de usuario: Administrador, Recepcionista, Cajero
+- Perfil de usuario con foto personalizada
+- Avatar sincronizado globalmente en todas las páginas
+- Control de acceso basado en roles
 
 ### 🛏️ Gestión de Habitaciones
-- Visualización de todas las habitaciones
+- Listado completo de habitaciones con búsqueda
 - Estados: Disponible, Ocupada, Mantenimiento
-- Filtrado y búsqueda avanzada
-- Información detallada por habitación
+- Asignación de clientes a habitaciones
+- Información detallada por cuarto (tipo, capacidad, precio)
+- Visualización de ocupación en tiempo real
 
 ### 📅 Gestión de Reservas
-- Crear, editar y cancelar reservas
-- Calendario interactivo
-- Validación de fechas
-- Historial de reservas
-
-### 👤 Gestión de Clientes
-- Base de datos de clientes
-- Búsqueda y filtrado
-- Información de contacto
+- CRUD completo de reservas
+- Validación de fechas de entrada y salida
+- Tipos de reserva: Airbnb, Otro
+- Estados: Pendiente, Confirmada, Cancelada, Finalizada
 - Historial de reservas por cliente
 
-### ✅ Check-in / Check-out
-- Registro de entrada y salida
-- Generación de facturas
-- Historial de huéspedes
-- Estados de ocupación en tiempo real
+### 👥 Gestión de Clientes
+- Base de datos centralizada de huéspedes
+- Búsqueda y filtrado avanzado
+- Información completa: nombre, documento, correo, teléfono, dirección
+- Vinculación con reservas y check-ins
+- Historial de estancias
 
-### 🛒 Gestión de Productos
-- Catálogo de productos/servicios
-- Precios y disponibilidad
-- Categorización
+### ✅ Check-in / Check-out
+- Registro detallado de entrada y salida
+- Cálculo automático de noches
+- Información del huésped: transporte, motivo del viaje, acompañantes
+- Generación de registros de ocupación
+- Historial de huéspedes
+
+### 🛒 Gestión de Productos y Servicios
+- Catálogo de productos/servicios del hotel
+- Organización por categorías
+- Control de precios (venta y compra)
+- Gestión de inventario
+- Cálculo automático de IVA
 
 ### 💰 Gestión de Ventas
-- Ventas a habitaciones
-- Registro de transacciones
-- Historial de ventas
-- Cálculo de totales
+- Registro de transacciones de servicios
+- Vinculación con habitaciones
+- Cálculo de totales y pagos
+- Historial de ventas por período
+- Reportes de ingresos
 
-### 📊 Reportes y Análisis
-- **KPIs en tiempo real:**
-  - Ocupación de habitaciones
-  - Ingresos totales
-  - Clientes activos
-  - Reservas pendientes
-  - Check-ins activos
-- Gráficos y estadísticas
-- Exportación de datos
+### 📊 Dashboard y Reportes
+- KPIs en tiempo real:
+  - Total de habitaciones y disponibilidad
+  - Clientes registrados
+  - Reservas activas
+  - Ventas del día
+- Estadísticas visuales
+- Análisis de ocupación
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Tecnologías
 
 ### Backend
-- **Java 8+**
-- **JSP (JavaServer Pages)**
-- **Servlets**
-- **JDBC**
-- **MySQL 
+| Tecnología | Versión | Propósito |
+|-----------|---------|----------|
+| **Java** | 8+ | Lenguaje principal |
+| **JSP** | 2.3+ | Vistas dinámicas |
+| **Servlets** | Jakarta EE 6.0 | Controladores |
+| **JDBC** | - | Acceso a datos |
+| **MySQL** | 5.7+ | Base de datos relacional |
 
 ### Frontend
-- **HTML5**
-- **CSS3 / Tailwind CSS**
-- **JavaScript (Vanilla)**
-- **Font Awesome Icons**
+| Tecnología | Propósito |
+|-----------|----------|
+| **HTML5** | Estructura |
+| **Tailwind CSS** | Estilos y diseño responsivo |
+| **JavaScript (Vanilla)** | Interactividad sin dependencias |
+| **Font Awesome** | Iconografía |
 
 ### Herramientas
-- **NetBeans IDE**
-- **Apache Tomcat 11**
-- **Git & GitHub**
+| Herramienta | Propósito |
+|-----------|----------|
+| **NetBeans IDE** | Entorno de desarrollo |
+| **Apache Tomcat 11** | Servidor de aplicaciones |
+| **Ant** | Herramienta de build |
+| **Git** | Control de versiones |
 
 ---
 
-## 📋 Requisitos Previos
+## 📋 Requisitos
 
-- **Java JDK 8 o superior**
+### Sistema
+- **Windows**, **macOS** o **Linux**
+- **Java Development Kit (JDK) 8 o superior**
 - **Apache Tomcat 9 o superior**
-- **MySQL 5.7 o superior** (o MariaDB)
-- **NetBeans IDE** (recomendado)
-- **Git**
+- **MySQL 5.7 o superior** (o MariaDB compatible)
+
+### Dependencias
+- **MySQL Connector/J 8.0.33** (debe estar en `web/WEB-INF/lib/`)
+- **Navegador web moderno** (Chrome, Firefox, Safari, Edge)
+
+### Recomendado
+- **NetBeans IDE 11+** para desarrollo
+- **MySQL Workbench** para administración de BD
 
 ---
 
 ## 🚀 Instalación
 
-### 1. Clonar el Repositorio
+### Paso 1: Clonar el Repositorio
+
 ```bash
-git clone https://github.com/tu-usuario/sistema-HOTEL.git
-cd sistema-HOTEL
+git clone https://github.com/andmen05/hotel-java-web.git
+cd hotel-java-web
 ```
 
-### 2. Configurar la Base de Datos
+### Paso 2: Configurar la Base de Datos
+
+1. **Abrir MySQL CLI o Workbench**
+
+2. **Ejecutar el script SQL:**
+```bash
+mysql -u root -p < database/sistema_hotel.sql
+```
+
+O manualmente en MySQL:
 ```sql
--- Crear base de datos
-CREATE DATABASE hotel_db;
-USE hotel_db;
-
--- Importar esquema (si existe archivo SQL)
-SOURCE database/schema.sql;
+SOURCE database/sistema_hotel.sql;
 ```
 
-### 3. Configurar Conexión a BD
-Editar archivo de configuración (si existe):
-```
-web/WEB-INF/config.properties
-```
-
-O en el código Java:
-```java
-String url = "jdbc:mysql://localhost:3306/hotel_db";
-String usuario = "root";
-String password = "tu_password";
+3. **Verificar la creación:**
+```sql
+SHOW DATABASES;
+USE sistema_hotel;
+SHOW TABLES;
 ```
 
-### 4. Compilar y Desplegar
+### Paso 3: Preparar el Controlador MySQL
+
+1. Descargar [MySQL Connector/J 8.0.33](https://dev.mysql.com/downloads/connector/j/)
+2. Extraer el archivo JAR
+3. Copiar a: `web/WEB-INF/lib/mysql-connector-java-8.0.33.jar`
+
+### Paso 4: Compilar y Desplegar
+
+**En NetBeans:**
+1. Abrir proyecto en NetBeans
+2. Menú: `Run → Clean and Build Project`
+3. Menú: `Run → Run Project`
+4. Se abrirá automáticamente en `http://localhost:8080/hotel-java-web`
+
+**Desde Terminal (Ant):**
 ```bash
-# En NetBeans:
-# 1. Abrir proyecto
-# 2. Clean and Build
-# 3. Run
-
-# O desde línea de comandos:
-mvn clean install
+ant clean
+ant build
+# Desplegar WAR en Tomcat manualmente
+cp build/hotel-java-web.war $TOMCAT_HOME/webapps/
 ```
 
-### 5. Acceder a la Aplicación
-```
-http://localhost:8080/sistema-HOTEL
-```
+### Paso 5: Verificar Instalación
+
+Acceder a: `http://localhost:8080/hotel-java-web`
+
+Debería ver la página de login.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```
-sistema-HOTEL/
+hotel-java-web/
 ├── src/
 │   └── java/com/hotel/
-│       ├── modelo/          # Clases de modelo (Usuario, Habitacion, etc)
-│       ├── dao/             # Data Access Objects
-│       ├── servlet/         # Servlets
-│       └── util/            # Utilidades
-├── web/
-│   ├── index.jsp            # Página de login
-│   ├── dashboard.jsp        # Dashboard principal
-│   ├── perfil.jsp           # Perfil de usuario
-│   ├── habitaciones.jsp     # Gestión de habitaciones
-│   ├── reservas.jsp         # Gestión de reservas
-│   ├── clientes.jsp         # Gestión de clientes
-│   ├── checkin.jsp          # Check-in / Check-out
-│   ├── productos.jsp        # Gestión de productos
-│   ├── ventas.jsp           # Gestión de ventas
-│   ├── reportes.jsp         # Reportes y análisis
-│   ├── js/                  # Scripts JavaScript
-│   │   ├── common.js        # Funciones comunes
-│   │   ├── avatar-global.js # Gestión de avatar global
-│   │   ├── perfil.js        # Lógica de perfil
-│   │   ├── actividad-perfil.js
-│   │   ├── topbar.js        # Menú desplegable
+│       ├── dao/                    # Data Access Objects (CRUD)
+│       │   ├── CategoriaDAO.java
+│       │   ├── CheckInDAO.java
+│       │   ├── ClienteDAO.java
+│       │   ├── HabitacionDAO.java
+│       │   ├── ProductoDAO.java
+│       │   ├── ReservaDAO.java
+│       │   ├── UsuarioDAO.java
+│       │   └── VentaDAO.java
+│       │
+│       ├── modelo/                 # Clases de Modelo (POJO)
+│       │   ├── Categoria.java
+│       │   ├── CheckIn.java
+│       │   ├── Cliente.java
+│       │   ├── Habitacion.java
+│       │   ├── Producto.java
+│       │   ├── ProductoVendido.java
+│       │   ├── Reserva.java
+│       │   ├── Usuario.java
+│       │   └── Venta.java
+│       │
+│       ├── servlets/               # Controladores HTTP
+│       │   ├── CheckInServlet.java
+│       │   ├── ClienteServlet.java
+│       │   ├── HabitacionServlet.java
+│       │   ├── LoginServlet.java
+│       │   ├── LogoutServlet.java
+│       │   ├── ProductoServlet.java
+│       │   ├── ReporteServlet.java
+│       │   ├── ReservaServlet.java
+│       │   └── VentaServlet.java
+│       │
+│       └── util/                   # Utilidades
+│           └── Conexion.java       # Gestor de conexión MySQL
+│
+├── web/                            # Archivos web
+│   ├── index.jsp                   # Página de login
+│   ├── dashboard.jsp               # Panel principal
+│   ├── clientes.jsp                # Gestión de clientes
+│   ├── habitaciones.jsp            # Gestión de habitaciones
+│   ├── reservas.jsp                # Gestión de reservas
+│   ├── checkin.jsp                 # Check-in/Check-out
+│   ├── productos.jsp               # Gestión de productos
+│   ├── ventas.jsp                  # Gestión de ventas
+│   ├── reportes.jsp                # Reportes y análisis
+│   ├── perfil.jsp                  # Perfil de usuario
+│   │
+│   ├── js/                         # Scripts JavaScript
+│   │   ├── common.js               # Funciones compartidas
+│   │   ├── avatar-global.js        # Sincronización de avatar
+│   │   ├── topbar.js               # Menú de navegación
+│   │   ├── perfil.js               # Lógica de perfil
 │   │   ├── clientes.js
 │   │   ├── habitaciones.js
 │   │   ├── reservas.js
@@ -175,140 +254,210 @@ sistema-HOTEL/
 │   │   ├── productos.js
 │   │   ├── ventas.js
 │   │   ├── reportes.js
-│   │   └── ...
-│   ├── css/                 # Estilos CSS
-│   └── WEB-INF/
-│       └── web.xml          # Configuración web
-└── database/
-    └── schema.sql           # Esquema de base de datos
+│   │   └── actividad-perfil.js
+│   │
+│   ├── css/                        # Estilos CSS (si existen)
+│   │
+│   ├── WEB-INF/
+│   │   ├── web.xml                 # Configuración de Servlets
+│   │   ├── context.xml             # Contexto de la aplicación
+│   │   └── lib/                    # Librerías Java (JAR)
+│   │       └── mysql-connector-java-8.0.33.jar
+│   │
+│   └── META-INF/
+│       ├── context.xml
+│       └── MANIFEST.MF
+│
+├── database/
+│   └── sistema_hotel.sql           # Script SQL inicial
+│
+├── build.xml                       # Configuración de Ant
+├── README.md                       # Este archivo
+└── nbproject/                      # Configuración NetBeans
 ```
+
+---
+
+
+
+## 🗄️ Base de Datos
+
+`database/sistema_hotel.sql`
+
+---
+
+## ⚙️ Configuración
+
+### Conexión a Base de Datos
+
+El archivo `src/java/com/hotel/util/Conexion.java` contiene la configuración:
+
+```java
+private static final String URL = "jdbc:mysql://localhost:3306/sistema_hotel?useSSL=false&serverTimezone=UTC&characterEncoding=utf8";
+private static final String USER = "root";
+private static final String PASSWORD = "";
+```
+
+**Para cambiar credenciales:**
+1. Editar `Conexion.java`
+2. Actualizar `URL`, `USER`, `PASSWORD`
+3. Recompilar con `ant clean build`
+
+### Sesiones HTTP
+
+Timeout configurado en `web/WEB-INF/web.xml`:
+```xml
+<session-timeout>30</session-timeout>
+```
+
+(30 minutos)
 
 ---
 
 ## 🔐 Autenticación
 
-### Credenciales de Prueba
-```
-Usuario: admin
-Contraseña: admin123
-```
+### Credenciales por Defecto
 
-> ⚠️ **Importante:** Cambiar credenciales en producción
+Después de ejecutar el script SQL, dispone de usuarios de prueba. Consulte la tabla `proyecto_usuarios`.
+
+
+### Métodos de Validación de Contraseña
+
+
+### Roles y Permisos
+
+- **Administrador**: Acceso completo
 
 ---
 
-## 📱 Funcionalidades Principales
+## 📱 Funcionalidades por Página
 
 ### Dashboard
-- Vista general del sistema
-- KPIs en tiempo real
-- Acceso rápido a módulos
+- Estadísticas de habitaciones (total, disponibles, ocupadas)
+- Total de clientes
+- Total de reservas
+- Ventas del día
+- Navegación a todos los módulos
 
-### Perfil de Usuario
-- Información personal
-- Foto de perfil (almacenada en localStorage)
-- Cambio de contraseña
-- Actividad reciente
-- Menú desplegable con opciones
+### Clientes
+- Listado con búsqueda
+- Crear nuevo cliente (nombre, apellido, documento, correo, teléfono, dirección)
+- Editar información
+- Eliminar cliente
+- Ver historial de reservas
 
-### Módulos de Gestión
-Cada módulo incluye:
-- ✅ Listado con búsqueda y filtrado
-- ✅ Crear nuevo registro
-- ✅ Editar registro existente
-- ✅ Eliminar registro
-- ✅ Validaciones en cliente y servidor
+### Habitaciones
+- Listado con estado actualizado
+- Crear nueva habitación (tipo, capacidad, precio)
+- Asignar cliente
+- Cambiar estado (Disponible, Ocupada, Mantenimiento)
+- Filtrar por estado
 
----
+### Reservas
+- Crear reserva (cliente, habitación, fechas)
+- Cambiar estado
+- Validación de fechas
+- Ver información del cliente y cuarto
 
-## 🎨 Diseño y UI
+### Check-in
+- Registrar entrada (habitación, cliente, transporte, motivo)
+- Cálculo automático de noches
+- Registrar acompañantes
+- Check-out (marcar como finalizado)
+- Historial de huéspedes
 
-- **Interfaz moderna** con Tailwind CSS
-- **Responsive design** (mobile, tablet, desktop)
-- **Iconos profesionales** con Font Awesome
-- **Colores consistentes** (Indigo/Blue)
-- **Animaciones suaves** y transiciones
-- **Notificaciones** de éxito/error
+### Productos
+- Gestión de catálogo (código, descripción, precios)
+- Organización por categoría
+- Control de inventario
+- Cálculo de IVA
 
----
+### Ventas
+- Registrar venta (habitación, producto, cantidad)
+- Cálculo de total
+- Historial de transacciones
+- Reporte de ingresos
 
-## 🔄 Flujos Principales
-
-### Reserva de Habitación
-```
-Cliente → Buscar Habitación → Crear Reserva → Confirmar → Check-in → Check-out
-```
-
-### Venta de Producto
-```
-Seleccionar Habitación → Agregar Producto → Calcular Total → Registrar Venta
-```
-
-### Reporte
-```
-Seleccionar Período → Generar Datos → Visualizar Gráficos → Exportar
-```
-
----
-
-## 📊 Base de Datos
-
-### Tablas Principales
-- `usuarios` - Usuarios del sistema
-- `habitaciones` - Habitaciones del hotel
-- `reservas` - Reservas de clientes
-- `clientes` - Información de clientes
-- `checkins` - Registros de entrada/salida
-- `productos` - Productos/servicios
-- `ventas` - Transacciones de ventas
+### Perfil
+- Ver información personal
+- Cambiar contraseña
+- Subir foto de perfil (se guarda en localStorage)
+- Ver actividad reciente
 
 ---
 
-## 🐛 Debugging
 
-### Logs en Consola
-Abrir F12 en el navegador para ver:
-- Inicialización de módulos
-- Carga de datos
-- Errores de validación
-- Actualizaciones de avatar
 
-### Logs del Servidor
-Ver en Tomcat:
-```
-CATALINA_HOME/logs/catalina.out
-```
+## 🎨 Diseño y UX
+
+- **Interfaz**: Tailwind CSS con tema Indigo/Blue
+- **Responsivo**: Funciona en desktop, tablet y móvil
+- **Iconografía**: Font Awesome 6.4.0
+- **Animaciones**: Transiciones suaves y notificaciones toast
+- **Fuente**: Poppins en headers, sistema por defecto en texto
+- **Colores**: Gradientes modernos y colores consistentes
 
 ---
 
-## 🚀 Deployment
+## 🐛 Troubleshooting
 
-### Producción
-1. Cambiar credenciales de BD
-2. Configurar HTTPS
-3. Minificar CSS/JS
-4. Usar CDN para recursos
-5. Configurar backups automáticos
+### Error: "No se encontró el driver de MySQL"
 
-### Variables de Entorno
+**Causa**: Falta el archivo JAR de MySQL Connector
+
+**Solución**:
+1. Descargar [MySQL Connector/J 8.0.33](https://dev.mysql.com/downloads/connector/j/)
+2. Copiar JAR a `web/WEB-INF/lib/`
+3. Recompilar el proyecto
+
+### Error: "Conexión rechazada a localhost:3306"
+
+**Causa**: MySQL no está corriendo
+
+**Solución**:
 ```bash
-export DB_HOST=localhost
-export DB_PORT=3306
-export DB_NAME=hotel_db
-export DB_USER=root
-export DB_PASSWORD=secure_password
+# Windows
+net start MySQL80
+
+# macOS
+brew services start mysql
+
+# Linux
+sudo service mysql start
 ```
+
+### Error: "Base de datos 'sistema_hotel' no existe"
+
+**Causa**: El script SQL no se ejecutó
+
+**Solución**:
+```bash
+mysql -u root -p < database/sistema_hotel.sql
+```
+
+### Contraseña incorrecta al conectar
+
+Verificar credenciales en `src/java/com/hotel/util/Conexion.java`:
+```java
+private static final String USER = "root";      // Cambiar si es necesario
+private static final String PASSWORD = "";      // Agregar si existe
+```
+
 
 ---
 
-## 📝 Notas Importantes
 
+## 📞 Soporte
 
-### Actividad Reciente
-- Se carga en tiempo real
-- Muestra últimas acciones del usuario
-- Se actualiza cada 10 segundos
+Para reportar bugs, sugerencias o consultas:
 
+📧 **Email:** andmen05dev@gmail.com
+
+---
+
+## 📄 Licencia
+
+Este proyecto está disponible bajo una licencia de uso personal y educativo.
 
 ---
 
@@ -318,21 +467,7 @@ export DB_PASSWORD=secure_password
 
 ---
 
-## 📞 Soporte
-
-Para reportar bugs o sugerencias:
-- 📧 Email: andmen05dev@gmail.com
-
----
-
-## ⭐ Si te fue útil, ¡no olvides dar una estrella!
-
-```
-⭐ Star this repo if you find it helpful!
-```
-
----
-
-**Última actualización:** Noviembre 2025
-**Versión:** 1.0.0
+**Última actualización:** Noviembre 2025  
+**Versión:** 1.0.0  
 **Estado:** En desarrollo activo ✅
+
