@@ -98,15 +98,26 @@
                     <h2 class="text-2xl font-bold text-gray-900">Gestión de Productos - Restaurante</h2>
                     <p class="text-sm text-gray-500">Administra el menú y el inventario</p>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 relative">
                     <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <span class="material-icons-outlined">notifications</span>
                     </button>
                     <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <span class="material-icons-outlined">settings</span>
                     </button>
-                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+                    <button id="avatarBtn" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:ring-2 hover:ring-primary hover:ring-offset-2 transition-all relative">
                         <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
+                    </button>
+                    <!-- Menú desplegable del usuario -->
+                    <div id="userMenu" class="hidden absolute right-0 top-14 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <a href="perfil.jsp" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">person</span>
+                            <span>Mi Perfil</span>
+                        </a>
+                        <a href="logout" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">logout</span>
+                            <span>Cerrar Sesión</span>
+                        </a>
                     </div>
                 </div>
             </header>
@@ -212,9 +223,15 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-2">Rango Precio</label>
-                                <input type="range" id="filtroRango" min="0" max="1000" step="10" class="w-full">
-                                <p class="text-xs text-gray-500 mt-1">$0 - $<span id="rangoValor">1000</span></p>
+                                <input type="range" id="filtroRango" min="0" max="100000" step="1000" value="100000" class="w-full">
+                                <p class="text-xs text-gray-500 mt-1">$0 - $<span id="rangoValor">100000</span></p>
                             </div>
+                        </div>
+                        <div class="mt-3 flex justify-end">
+                            <button type="button" onclick="limpiarFiltros()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition flex items-center space-x-2 font-semibold text-sm">
+                                <span class="material-icons-outlined text-sm">clear</span>
+                                <span>Limpiar Filtros</span>
+                            </button>
                         </div>
                     </div>
 

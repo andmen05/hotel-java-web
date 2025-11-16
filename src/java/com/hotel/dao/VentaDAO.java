@@ -110,7 +110,10 @@ public class VentaDAO {
             ps.setInt(1, idHabitacion);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                ventas.add(mapearVenta(rs));
+                Venta venta = mapearVenta(rs);
+                // Cargar productos asociados
+                venta.setProductos(obtenerProductosVendidos(venta.getId()));
+                ventas.add(venta);
             }
         } catch (SQLException e) {
             System.err.println("Error al listar ventas por habitación: " + e.getMessage());

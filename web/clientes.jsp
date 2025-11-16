@@ -98,15 +98,26 @@
                     <h2 class="text-2xl font-bold text-gray-900">Gestión de Clientes</h2>
                     <p class="text-sm text-gray-500">Base de datos completa de clientes</p>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 relative">
                     <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <span class="material-icons-outlined">notifications</span>
                     </button>
                     <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <span class="material-icons-outlined">settings</span>
                     </button>
-                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+                    <button id="avatarBtn" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:ring-2 hover:ring-primary hover:ring-offset-2 transition-all relative">
                         <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
+                    </button>
+                    <!-- Menú desplegable del usuario -->
+                    <div id="userMenu" class="hidden absolute right-0 top-14 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <a href="perfil.jsp" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">person</span>
+                            <span>Mi Perfil</span>
+                        </a>
+                        <a href="logout" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">logout</span>
+                            <span>Cerrar Sesión</span>
+                        </a>
                     </div>
                 </div>
             </header>
@@ -157,9 +168,9 @@
 
                         <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
                             <div>
-                                <p class="text-sm text-gray-500">Nuevos Este Mes</p>
+                                <p class="text-sm text-gray-500">Con Reservas Recientes</p>
                                 <p class="text-2xl font-bold text-gray-900 mt-1" id="clientesNuevos">0</p>
-                                <p class="text-xs text-gray-400">Registrados</p>
+                                <p class="text-xs text-gray-400">Últimos 30 días</p>
                             </div>
                             <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
                                 <span class="material-icons-outlined text-2xl">person_add</span>
@@ -170,7 +181,7 @@
                             <div>
                                 <p class="text-sm text-gray-500">Ingresos Totales</p>
                                 <p class="text-2xl font-bold text-gray-900 mt-1" id="ingresosTotales">$0</p>
-                                <p class="text-xs text-gray-400">De clientes</p>
+                                <p class="text-xs text-gray-400">Reservas confirmadas</p>
                             </div>
                             <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                                 <span class="material-icons-outlined text-2xl">trending_up</span>
@@ -183,16 +194,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-2">Buscar</label>
-                                <input type="text" id="buscarCliente" placeholder="Nombre, documento, email..." 
+                                <input type="text" id="buscarCliente" placeholder="Nombre, documento, email, teléfono..." 
                                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-700 mb-2">Tipo Cliente</label>
-                                <select id="filtroTipo" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
-                                    <option value="">Todos</option>
-                                    <option value="Nacional">Nacional</option>
-                                    <option value="Internacional">Internacional</option>
-                                </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-2">Estado</label>
@@ -201,6 +204,12 @@
                                     <option value="Activo">Activo</option>
                                     <option value="Inactivo">Inactivo</option>
                                 </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="limpiarFiltros()" class="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition flex items-center justify-center space-x-2 font-semibold text-sm">
+                                    <span class="material-icons-outlined text-sm">clear</span>
+                                    <span>Limpiar Filtros</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -239,7 +248,7 @@
                 <div class="flex justify-between items-center">
                     <h3 class="text-2xl font-bold" id="modalTitulo">Nuevo Cliente</h3>
                     <button onclick="cerrarModal()" class="text-white hover:bg-indigo-800 p-2 rounded-lg transition">
-                        <i class="fas fa-times text-xl"></i>
+                        <span class="material-icons-outlined text-xl">close</span>
                     </button>
                 </div>
             </div>
@@ -249,8 +258,9 @@
                 <input type="hidden" id="clienteId">
                 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-user mr-2 text-indigo-600"></i>Nombre
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <span class="material-icons-outlined mr-2 text-indigo-600 text-sm">person</span>
+                        Nombre
                     </label>
                     <input type="text" id="nombre" required 
                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition"
@@ -258,8 +268,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-user mr-2 text-indigo-600"></i>Apellido
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <span class="material-icons-outlined mr-2 text-indigo-600 text-sm">person</span>
+                        Apellido
                     </label>
                     <input type="text" id="apellido" required 
                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition"
@@ -267,8 +278,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-id-card mr-2 text-indigo-600"></i>Documento
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <span class="material-icons-outlined mr-2 text-indigo-600 text-sm">badge</span>
+                        Documento
                     </label>
                     <input type="number" id="documento" required 
                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition"
@@ -276,8 +288,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-2 text-indigo-600"></i>Correo
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <span class="material-icons-outlined mr-2 text-indigo-600 text-sm">email</span>
+                        Correo
                     </label>
                     <input type="email" id="correo" 
                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition"
@@ -285,8 +298,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-phone mr-2 text-indigo-600"></i>Teléfono
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <span class="material-icons-outlined mr-2 text-indigo-600 text-sm">phone</span>
+                        Teléfono
                     </label>
                     <input type="text" id="telefono" 
                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition"
@@ -294,8 +308,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-map-marker-alt mr-2 text-indigo-600"></i>Dirección
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                        <span class="material-icons-outlined mr-2 text-indigo-600 text-sm">location_on</span>
+                        Dirección
                     </label>
                     <textarea id="direccion" rows="3"
                               class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition"
@@ -310,7 +325,7 @@
                     </button>
                     <button type="submit" 
                             class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg transition font-semibold flex items-center space-x-2">
-                        <i class="fas fa-save"></i>
+                        <span class="material-icons-outlined text-sm">save</span>
                         <span>Guardar</span>
                     </button>
                 </div>

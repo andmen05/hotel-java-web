@@ -12,109 +12,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - Sistema Hotelero</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Mi Perfil - Hotel Paradise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: "#4F46E5",
+                "background-light": "#F8FAFC",
+              },
+              fontFamily: {
+                display: ["Poppins", "sans-serif"],
+              },
+              borderRadius: {
+                DEFAULT: "0.75rem",
+              },
+            },
+          },
+        };
+    </script>
+    <style>
+        .material-icons-outlined {
+          font-size: inherit;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="font-display bg-background-light text-gray-700">
     <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-48 bg-gradient-to-b from-indigo-900 to-indigo-800 text-white shadow-2xl">
-            <div class="p-6 border-b border-indigo-700">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
-                        <i class="fas fa-hotel text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold">Hotel Paradise</h1>
-                        <p class="text-xs text-indigo-200">andmen05</p>
-                    </div>
+        <aside class="w-64 flex-shrink-0 bg-indigo-900 text-indigo-100 flex flex-col">
+            <div class="p-6 text-center">
+                <div class="bg-indigo-800 rounded-lg p-3 inline-flex items-center justify-center mb-2">
+                    <span class="material-icons-outlined text-4xl text-white">hotel</span>
                 </div>
+                <h1 class="text-xl font-bold text-white">Hotel Paradise</h1>
+                <p class="text-sm text-indigo-300">andmen05</p>
             </div>
-
-            <nav class="mt-8 space-y-2 px-4">
-                <a href="dashboard.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
+            <nav class="flex-1 px-4 space-y-2">
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="dashboard.jsp">
+                    <span class="material-icons-outlined mr-3">dashboard</span>
+                    Dashboard
                 </a>
-                <a href="clientes.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-users"></i>
-                    <span>Clientes</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="clientes.jsp">
+                    <span class="material-icons-outlined mr-3">people</span>
+                    Clientes
                 </a>
-                <a href="habitaciones.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-bed"></i>
-                    <span>Habitaciones</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="habitaciones.jsp">
+                    <span class="material-icons-outlined mr-3">king_bed</span>
+                    Habitaciones
                 </a>
-                <a href="reservas.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reservas</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="reservas.jsp">
+                    <span class="material-icons-outlined mr-3">book_online</span>
+                    Reservas
                 </a>
-                <a href="checkin.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Check-in</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="checkin.jsp">
+                    <span class="material-icons-outlined mr-3">login</span>
+                    Check-in
                 </a>
-                <a href="productos.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-utensils"></i>
-                    <span>Productos</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="productos.jsp">
+                    <span class="material-icons-outlined mr-3">restaurant</span>
+                    Productos
                 </a>
-                <a href="ventas.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Ventas</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="ventas.jsp">
+                    <span class="material-icons-outlined mr-3">shopping_cart</span>
+                    Ventas
                 </a>
-                <a href="reportes.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
-                </a>
-                <a href="perfil.jsp" class="flex items-center space-x-3 px-4 py-3 bg-indigo-700 rounded-lg hover:bg-indigo-600 transition">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Mi Perfil</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="reportes.jsp">
+                    <span class="material-icons-outlined mr-3">assessment</span>
+                    Reportes
                 </a>
             </nav>
-
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700 w-48">
-                <a href="logout" class="flex items-center space-x-3 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition w-full justify-center">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Salir</span>
+            <div class="p-4 mt-auto">
+                <a href="logout" class="w-full flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200">
+                    <span class="material-icons-outlined mr-2">logout</span>
+                    Salir
                 </a>
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
-            <div class="bg-white shadow-md px-8 py-4 flex justify-between items-center">
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="flex-shrink-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center sticky top-0 z-10">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Mi Perfil</h2>
-                    <p class="text-gray-600 text-sm">Gestiona tu información personal y seguridad</p>
+                    <h2 class="text-2xl font-bold text-gray-900">Mi Perfil</h2>
+                    <p class="text-sm text-gray-500">Gestiona tu información personal y seguridad</p>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-bell text-gray-600 text-xl"></i>
+                <div class="flex items-center space-x-4 relative">
+                    <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <span class="material-icons-outlined">notifications</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-cog text-gray-600 text-xl"></i>
+                    <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <span class="material-icons-outlined">settings</span>
                     </button>
-                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                        <%= usuario.getNombre().charAt(0) %>
+                    <button id="avatarBtn" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:ring-2 hover:ring-primary hover:ring-offset-2 transition-all relative">
+                        <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
+                    </button>
+                    <!-- Menú desplegable del usuario -->
+                    <div id="userMenu" class="hidden absolute right-0 top-14 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <a href="perfil.jsp" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">person</span>
+                            <span>Mi Perfil</span>
+                        </a>
+                        <a href="logout" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">logout</span>
+                            <span>Cerrar Sesión</span>
+                        </a>
                     </div>
                 </div>
-            </div>
+            </header>
 
             <!-- Scrollable Content -->
             <div class="flex-1 overflow-auto">
                 <div class="p-8">
                     <!-- Profile Header Card -->
-                    <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl shadow-lg p-8 text-white mb-8">
+                    <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl shadow-lg p-8 text-white mb-8">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-6">
-                                <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center border-4 border-white">
-                                    <i class="fas fa-user text-5xl"></i>
+                                <div id="avatarPerfil" class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center border-4 border-white overflow-hidden">
+                                    <span class="material-icons-outlined text-5xl text-white">person</span>
                                 </div>
                                 <div>
-                                    <h1 class="text-4xl font-bold"><%= usuario.getNombre() %></h1>
+                                    <h1 class="text-4xl font-bold"><%= usuario.getNombre() != null ? usuario.getNombre() : "Usuario" %></h1>
                                     <p class="text-indigo-100 text-lg">ID: <%= usuario.getId() %></p>
-                                    <p class="text-indigo-100 mt-2">
-                                        <i class="fas fa-user mr-2"></i>
+                                    <p class="text-indigo-100 mt-2 flex items-center">
+                                        <span class="material-icons-outlined mr-2 text-sm">account_circle</span>
                                         <%= usuario.getUsuario() != null ? usuario.getUsuario() : "No registrado" %>
                                     </p>
                                 </div>
@@ -127,67 +149,81 @@
                     </div>
 
                     <!-- Two Column Layout -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Left Column: Personal Info -->
                         <div class="lg:col-span-2 space-y-6">
                             <!-- Información Personal -->
-                            <div class="bg-white rounded-2xl shadow-md p-8">
+                            <div class="bg-white rounded-xl shadow-md p-6">
                                 <div class="flex items-center justify-between mb-6">
-                                    <h3 class="text-2xl font-bold text-gray-800 flex items-center space-x-3">
-                                        <i class="fas fa-user-edit text-indigo-600"></i>
+                                    <h3 class="text-xl font-bold text-gray-800 flex items-center space-x-3">
+                                        <span class="material-icons-outlined text-primary">person</span>
                                         <span>Información Personal</span>
                                     </h3>
-                                    <button onclick="editarPerfil()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center space-x-2">
-                                        <i class="fas fa-edit"></i>
+                                    <button onclick="editarPerfil()" class="px-4 py-2 bg-primary hover:bg-indigo-700 text-white rounded-lg transition flex items-center space-x-2 font-semibold">
+                                        <span class="material-icons-outlined text-sm">edit</span>
                                         <span>Editar</span>
                                     </button>
                                 </div>
                                 
                                 <form id="formPerfil" class="space-y-4" style="display: none;">
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
-                                            <input type="text" id="nombre" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600" value="<%= usuario.getNombre() != null ? usuario.getNombre() : "" %>">
+                                            <input type="text" id="nombre" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors" value="<%= usuario.getNombre() != null ? usuario.getNombre() : "" %>">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-semibold text-gray-700 mb-2">Usuario</label>
-                                            <input type="text" id="usuario" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600" value="<%= usuario.getUsuario() != null ? usuario.getUsuario() : "" %>">
+                                            <input type="text" id="usuario" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors" value="<%= usuario.getUsuario() != null ? usuario.getUsuario() : "" %>">
                                         </div>
                                     </div>
                                     <div class="flex space-x-3 pt-4">
-                                        <button type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-semibold">
-                                            <i class="fas fa-save mr-2"></i>Guardar
+                                        <button type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-semibold flex items-center space-x-2">
+                                            <span class="material-icons-outlined text-sm">save</span>
+                                            <span>Guardar</span>
                                         </button>
-                                        <button type="button" onclick="cancelarEdicion()" class="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition font-semibold">
-                                            <i class="fas fa-times mr-2"></i>Cancelar
+                                        <button type="button" onclick="cancelarEdicion()" class="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition font-semibold flex items-center space-x-2">
+                                            <span class="material-icons-outlined text-sm">close</span>
+                                            <span>Cancelar</span>
                                         </button>
                                     </div>
                                 </form>
 
                                 <div id="infoPerfil" class="space-y-4">
                                     <div class="flex justify-between items-center pb-4 border-b border-gray-200">
-                                        <span class="text-gray-600">Nombre:</span>
+                                        <span class="text-gray-600 flex items-center">
+                                            <span class="material-icons-outlined mr-2 text-sm text-gray-400">badge</span>
+                                            Nombre:
+                                        </span>
                                         <span class="font-semibold text-gray-800"><%= usuario.getNombre() != null ? usuario.getNombre() : "No registrado" %></span>
                                     </div>
                                     <div class="flex justify-between items-center pb-4 border-b border-gray-200">
-                                        <span class="text-gray-600">Usuario:</span>
+                                        <span class="text-gray-600 flex items-center">
+                                            <span class="material-icons-outlined mr-2 text-sm text-gray-400">account_circle</span>
+                                            Usuario:
+                                        </span>
                                         <span class="font-semibold text-gray-800"><%= usuario.getUsuario() != null ? usuario.getUsuario() : "No registrado" %></span>
                                     </div>
                                     <div class="flex justify-between items-center pb-4 border-b border-gray-200">
-                                        <span class="text-gray-600">ID Usuario:</span>
+                                        <span class="text-gray-600 flex items-center">
+                                            <span class="material-icons-outlined mr-2 text-sm text-gray-400">fingerprint</span>
+                                            ID Usuario:
+                                        </span>
                                         <span class="font-semibold text-gray-800"><%= usuario.getId() %></span>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">Rol:</span>
+                                        <span class="text-gray-600 flex items-center">
+                                            <span class="material-icons-outlined mr-2 text-sm text-gray-400">admin_panel_settings</span>
+                                            Rol:
+                                        </span>
                                         <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold"><%= usuario.getRol() != null ? usuario.getRol() : "Usuario" %></span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Cambiar Contraseña -->
-                            <div class="bg-white rounded-2xl shadow-md p-8">
-                                <h3 class="text-2xl font-bold text-gray-800 flex items-center space-x-3 mb-6">
-                                    <i class="fas fa-lock text-red-600"></i>
+                            <div class="bg-white rounded-xl shadow-md p-6">
+                                <h3 class="text-xl font-bold text-gray-800 flex items-center space-x-3 mb-6">
+                                    <span class="material-icons-outlined text-red-600">lock</span>
                                     <span>Cambiar Contraseña</span>
                                 </h3>
                                 
@@ -195,32 +231,33 @@
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña Actual</label>
                                         <div class="relative">
-                                            <input type="password" id="contraseniaActual" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600" placeholder="Ingresa tu contraseña actual">
+                                            <input type="password" id="contraseniaActual" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors pr-10" placeholder="Ingresa tu contraseña actual">
                                             <button type="button" onclick="togglePassword('contraseniaActual')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-eye"></i>
+                                                <span class="material-icons-outlined text-sm">visibility</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-700 mb-2">Nueva Contraseña</label>
                                         <div class="relative">
-                                            <input type="password" id="contraseniaNueva" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600" placeholder="Ingresa tu nueva contraseña">
+                                            <input type="password" id="contraseniaNueva" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors pr-10" placeholder="Ingresa tu nueva contraseña">
                                             <button type="button" onclick="togglePassword('contraseniaNueva')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-eye"></i>
+                                                <span class="material-icons-outlined text-sm">visibility</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
                                         <div class="relative">
-                                            <input type="password" id="contraseniaConfirmar" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-600" placeholder="Confirma tu nueva contraseña">
+                                            <input type="password" id="contraseniaConfirmar" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors pr-10" placeholder="Confirma tu nueva contraseña">
                                             <button type="button" onclick="togglePassword('contraseniaConfirmar')" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700">
-                                                <i class="fas fa-eye"></i>
+                                                <span class="material-icons-outlined text-sm">visibility</span>
                                             </button>
                                         </div>
                                     </div>
-                                    <button type="submit" class="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-semibold mt-6">
-                                        <i class="fas fa-key mr-2"></i>Cambiar Contraseña
+                                    <button type="submit" class="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-semibold mt-6 flex items-center justify-center space-x-2">
+                                        <span class="material-icons-outlined text-sm">vpn_key</span>
+                                        <span>Cambiar Contraseña</span>
                                     </button>
                                 </form>
                             </div>
@@ -229,18 +266,18 @@
                         <!-- Right Column: Stats & Actions -->
                         <div class="space-y-6">
                             <!-- Foto de Perfil -->
-                            <div class="bg-white rounded-2xl shadow-md p-8">
-                                <h3 class="text-xl font-bold text-gray-800 flex items-center space-x-3 mb-6">
-                                    <i class="fas fa-image text-blue-600"></i>
+                            <div class="bg-white rounded-xl shadow-md p-6">
+                                <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-3 mb-6">
+                                    <span class="material-icons-outlined text-blue-600">image</span>
                                     <span>Foto de Perfil</span>
                                 </h3>
                                 
                                 <div class="flex flex-col items-center space-y-4">
-                                    <div id="avatarPerfil" class="w-32 h-32 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white border-4 border-gray-200 overflow-hidden">
-                                        <i class="fas fa-user text-6xl"></i>
+                                    <div id="avatarPerfil" class="w-32 h-32 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center text-white border-4 border-gray-200 overflow-hidden">
+                                        <span class="material-icons-outlined text-6xl">person</span>
                                     </div>
-                                    <button type="button" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-semibold flex items-center space-x-2 cursor-pointer">
-                                        <i class="fas fa-upload"></i>
+                                    <button type="button" class="px-6 py-2 bg-primary hover:bg-indigo-700 text-white rounded-lg transition font-semibold flex items-center space-x-2 cursor-pointer">
+                                        <span class="material-icons-outlined text-sm">upload</span>
                                         <span>Subir Foto</span>
                                     </button>
                                     <p class="text-xs text-gray-500 text-center">JPG, PNG, GIF o WebP (máx. 5MB)</p>
@@ -248,38 +285,38 @@
                             </div>
 
                             <!-- Actividad Reciente -->
-                            <div class="bg-white rounded-2xl shadow-md p-8">
-                                <h3 class="text-xl font-bold text-gray-800 flex items-center space-x-3 mb-6">
-                                    <i class="fas fa-history text-green-600"></i>
+                            <div class="bg-white rounded-xl shadow-md p-6">
+                                <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-3 mb-6">
+                                    <span class="material-icons-outlined text-green-600">history</span>
                                     <span>Actividad Reciente</span>
                                 </h3>
                                 
                                 <div id="actividadRecienteContainer" class="space-y-3">
                                     <div class="text-center py-8">
-                                        <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
-                                        <p class="text-gray-500 mt-2">Cargando actividad...</p>
+                                        <span class="material-icons-outlined text-gray-400 text-4xl animate-spin">refresh</span>
+                                        <p class="text-gray-500 mt-2 text-sm">Cargando actividad...</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Seguridad -->
-                            <div class="bg-white rounded-2xl shadow-md p-8">
-                                <h3 class="text-xl font-bold text-gray-800 flex items-center space-x-3 mb-6">
-                                    <i class="fas fa-shield-alt text-purple-600"></i>
+                            <div class="bg-white rounded-xl shadow-md p-6">
+                                <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-3 mb-6">
+                                    <span class="material-icons-outlined text-purple-600">security</span>
                                     <span>Seguridad</span>
                                 </h3>
                                 
                                 <div class="space-y-3">
                                     <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                                         <div class="flex items-center space-x-2">
-                                            <i class="fas fa-check-circle text-green-600"></i>
+                                            <span class="material-icons-outlined text-green-600 text-sm">check_circle</span>
                                             <span class="text-sm font-semibold text-gray-800">Contraseña fuerte</span>
                                         </div>
-                                        <i class="fas fa-check text-green-600"></i>
+                                        <span class="material-icons-outlined text-green-600 text-sm">check</span>
                                     </div>
                                     <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                                         <div class="flex items-center space-x-2">
-                                            <i class="fas fa-lock text-blue-600"></i>
+                                            <span class="material-icons-outlined text-blue-600 text-sm">lock</span>
                                             <span class="text-sm font-semibold text-gray-800">Sesión activa</span>
                                         </div>
                                         <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Activa</span>
@@ -290,7 +327,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Scripts -->

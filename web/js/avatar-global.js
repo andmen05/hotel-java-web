@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function cargarFotoGlobalEnTodoLado() {
     const fotoPerfil = localStorage.getItem('fotoPerfil');
-    console.log('Avatar Global - Buscando foto:', fotoPerfil ? 'Encontrada (' + fotoPerfil.length + ' bytes)' : 'No encontrada');
     
     if (fotoPerfil) {
         // 1. Actualizar avatar en top bar (en cualquier página)
@@ -20,10 +19,16 @@ function cargarFotoGlobalEnTodoLado() {
         if (avatarBtn) {
             const img = avatarBtn.querySelector('img');
             if (!img) {
-                console.log('✓ Actualizando avatar en top bar');
+                // Guardar las clases originales del botón
+                const originalClasses = avatarBtn.className;
                 avatarBtn.innerHTML = `<img src="${fotoPerfil}" alt="Foto de Perfil" class="w-full h-full object-cover rounded-full">`;
-                avatarBtn.style.backgroundImage = 'none';
+                // Restaurar las clases del botón
+                avatarBtn.className = originalClasses;
+                avatarBtn.style.backgroundColor = 'transparent';
                 avatarBtn.style.color = 'transparent';
+            } else {
+                // Actualizar la imagen si ya existe
+                img.src = fotoPerfil;
             }
         }
         
@@ -32,11 +37,26 @@ function cargarFotoGlobalEnTodoLado() {
         if (avatarPerfil) {
             const img = avatarPerfil.querySelector('img');
             if (!img) {
-                console.log('✓ Actualizando avatar en perfil (por ID)');
                 avatarPerfil.innerHTML = `<img src="${fotoPerfil}" alt="Foto de Perfil" class="w-full h-full object-cover">`;
+            } else {
+                img.src = fotoPerfil;
             }
-        } else {
-            console.log('⚠ Avatar en perfil no encontrado por ID');
+        }
+    } else {
+        // Si no hay foto, asegurarse de que el avatar muestre la inicial
+        const avatarBtn = document.getElementById('avatarBtn');
+        if (avatarBtn) {
+            const img = avatarBtn.querySelector('img');
+            if (img) {
+                // Si hay una imagen pero no hay foto guardada, restaurar el estado original
+                // Esto puede pasar si se borra el localStorage
+                const initial = avatarBtn.getAttribute('data-initial');
+                if (initial) {
+                    avatarBtn.innerHTML = initial;
+                    avatarBtn.style.backgroundColor = '';
+                    avatarBtn.style.color = '';
+                }
+            }
         }
     }
 }

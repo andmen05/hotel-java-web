@@ -8,12 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (avatarBtn && userMenu) {
         avatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            e.preventDefault();
             userMenu.classList.toggle('hidden');
         });
         
         // Cerrar menú cuando se hace clic fuera
         document.addEventListener('click', (e) => {
-            if (!avatarBtn.contains(e.target) && !userMenu.contains(e.target)) {
+            // Verificar si el clic fue fuera del avatar y del menú
+            const clickedAvatar = avatarBtn.contains(e.target) || avatarBtn === e.target;
+            const clickedMenu = userMenu.contains(e.target) || userMenu === e.target;
+            
+            if (!clickedAvatar && !clickedMenu) {
                 userMenu.classList.add('hidden');
             }
         });
@@ -25,5 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 userMenu.classList.add('hidden');
             });
         });
+    } else {
+        console.warn('Avatar o menú de usuario no encontrado');
     }
 });

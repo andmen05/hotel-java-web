@@ -3,19 +3,44 @@
 let habitaciones = [];
 let habitacionesFiltradas = [];
 let checkinsActivos = [];
+let reservas = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏨 Habitaciones - Inicializando...');
     cargarDatos();
     
     // Event listeners para filtros
-    document.getElementById('buscarHabitacion')?.addEventListener('input', aplicarFiltros);
-    document.getElementById('filtroTipo')?.addEventListener('change', aplicarFiltros);
-    document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
-    document.getElementById('filtroRango')?.addEventListener('input', (e) => {
-        document.getElementById('rangoValor').textContent = e.target.value;
-        aplicarFiltros();
-    });
+    const buscarInput = document.getElementById('buscarHabitacion');
+    const filtroTipo = document.getElementById('filtroTipo');
+    const filtroEstado = document.getElementById('filtroEstado');
+    
+    if (buscarInput) {
+        buscarInput.addEventListener('input', () => {
+            console.log('Búsqueda activada:', buscarInput.value);
+            aplicarFiltros();
+        });
+        
+        buscarInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                aplicarFiltros();
+            }
+        });
+    }
+    
+    if (filtroTipo) {
+        filtroTipo.addEventListener('change', () => {
+            console.log('Filtro de tipo cambiado:', filtroTipo.value);
+            aplicarFiltros();
+        });
+    }
+    
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', () => {
+            console.log('Filtro de estado cambiado:', filtroEstado.value);
+            aplicarFiltros();
+        });
+    }
     
     // Actualizar cada 5 segundos
     setInterval(cargarDatos, 5000);
@@ -32,26 +57,27 @@ async function cargarDatos() {
         
         console.log('Iniciando carga de datos de habitaciones...');
         
-        const [habitacionesData, clientesData] = await Promise.all([
+        const [habitacionesData, reservasData] = await Promise.all([
             fetchData('habitaciones?action=listar').catch(e => { console.error('Error habitaciones:', e); return []; }),
-            fetchData('clientes?action=listar').catch(e => { console.error('Error clientes:', e); return []; })
+            fetchData('reservas?action=listar').catch(e => { console.error('Error reservas:', e); return []; })
         ]);
         
         habitaciones = habitacionesData || [];
+        reservas = reservasData || [];
         
-        // Intentar cargar check-ins, pero si falla, usar array vacío (sin mostrar error)
+        // Intentar cargar check-ins activos
         try {
-            const response = await fetch('checkins?action=listar');
-            if (response.ok) {
-                checkinsActivos = await response.json() || [];
-            } else {
-                checkinsActivos = [];
-            }
+            checkinsActivos = await fetchData('checkin?action=activos') || [];
         } catch (e) {
+            console.warn('⚠️ No se pudieron cargar check-ins activos:', e.message);
             checkinsActivos = [];
         }
         
-        console.log('✓ Datos obtenidos:', { habitacionesCount: habitaciones.length, checkinsCount: checkinsActivos.length });
+        console.log('✓ Datos obtenidos:', { 
+            habitacionesCount: habitaciones.length, 
+            checkinsCount: checkinsActivos.length,
+            reservasCount: reservas.length 
+        });
         
         // Obtener IDs de habitaciones con check-in activo
         const habitacionesOcupadasPorCheckin = checkinsActivos.map(c => c.habitacion);
@@ -68,11 +94,31 @@ async function cargarDatos() {
         
         const mantenimiento = habitaciones.filter(h => h.estado === 'Mantenimiento').length;
         
-        // Ingresos proyectados (ocupadas * precio promedio)
-        const precioPromedio = habitaciones.length > 0 
-            ? habitaciones.reduce((sum, h) => sum + (h.precioNoche || 0), 0) / habitaciones.length 
-            : 0;
-        const ingresosProyectados = ocupadas * precioPromedio * 30;
+        // Ingresos proyectados - calcular basándose en reservas confirmadas del mes actual
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+        
+        const reservasDelMes = reservas.filter(r => {
+            if (r.estado !== 'Confirmada') return false;
+            const fechaEntrada = new Date(r.fechaEntrada);
+            fechaEntrada.setHours(0, 0, 0, 0);
+            return fechaEntrada >= inicioMes && fechaEntrada <= finMes;
+        });
+        
+        const ingresosProyectados = reservasDelMes.reduce((sum, r) => {
+            const habitacion = habitaciones.find(h => h.id === r.habitacion);
+            if (!habitacion) return sum;
+            
+            const fechaEntrada = new Date(r.fechaEntrada);
+            const fechaSalida = new Date(r.fechaSalida);
+            const noches = Math.ceil((fechaSalida - fechaEntrada) / (1000 * 60 * 60 * 24));
+            const precioNoche = habitacion.precioNoche || 0;
+            const totalReserva = noches * precioNoche;
+            
+            return sum + totalReserva;
+        }, 0);
         
         // Actualizar tarjetas de resumen
         const disponiblesEl = document.getElementById('disponibles');
@@ -92,8 +138,7 @@ async function cargarDatos() {
         
         console.log('✓ KPI actualizados:', { total, disponibles, ocupadas, mantenimiento, ingresosProyectados });
         
-        // Limpiar filtros y renderizar
-        habitacionesFiltradas = [];
+        // Aplicar filtros actuales (o mostrar todos si no hay filtros)
         aplicarFiltros();
     } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -101,21 +146,53 @@ async function cargarDatos() {
 }
 
 function aplicarFiltros() {
-    const busqueda = document.getElementById('buscarHabitacion')?.value.toLowerCase() || '';
-    const tipo = document.getElementById('filtroTipo')?.value || '';
-    const estado = document.getElementById('filtroEstado')?.value || '';
-    const rango = parseInt(document.getElementById('filtroRango')?.value || '500');
+    console.log('aplicarFiltros() llamado');
+    console.log('habitaciones disponibles:', habitaciones.length);
+    
+    if (habitaciones.length === 0) {
+        console.warn('No hay habitaciones para filtrar');
+        const tbody = document.getElementById('tablaHabitaciones');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500"><span class="material-icons-outlined text-4xl block mb-2">inbox</span><p class="mt-2">Cargando habitaciones...</p></td></tr>';
+        }
+        return;
+    }
+    
+    const buscarInput = document.getElementById('buscarHabitacion');
+    const filtroTipoSelect = document.getElementById('filtroTipo');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    
+    if (!buscarInput) {
+        console.error('ERROR: No se encontró el campo buscarHabitacion');
+        return;
+    }
+    
+    const busqueda = buscarInput.value ? buscarInput.value.trim().toLowerCase() : '';
+    const tipo = filtroTipoSelect ? filtroTipoSelect.value : '';
+    const estado = filtroEstadoSelect ? filtroEstadoSelect.value : '';
+    
+    console.log('Filtros aplicados:', { busqueda, tipo, estado, habitacionesCount: habitaciones.length });
     
     habitacionesFiltradas = habitaciones.filter(h => {
-        // Filtro búsqueda
-        const coincideBusqueda = !busqueda || 
-            h.idHabitacion.toString().includes(busqueda) ||
-            h.tipoHabitacion.toLowerCase().includes(busqueda);
+        // Filtro búsqueda - busca en ID, tipo, precio y capacidad
+        let coincideBusqueda = true;
+        if (busqueda && busqueda.length > 0) {
+            const idHabitacion = (h.idHabitacion || '').toString().toLowerCase();
+            const tipoHabitacion = (h.tipoHabitacion || '').toString().toLowerCase();
+            const precio = String(h.precioNoche || 0).toLowerCase();
+            const capacidad = String(h.capacidad || 0).toLowerCase();
+            
+            coincideBusqueda = 
+                idHabitacion.includes(busqueda) ||
+                tipoHabitacion.includes(busqueda) ||
+                precio.includes(busqueda) ||
+                capacidad.includes(busqueda);
+        }
         
         // Filtro tipo
         const coincideTipo = !tipo || h.tipoHabitacion === tipo;
         
-        // Filtro estado
+        // Filtro estado - considerar check-ins activos
         let coincideEstado = true;
         if (estado) {
             const tieneCheckinActivo = checkinsActivos.some(c => c.habitacion === h.id);
@@ -123,12 +200,10 @@ function aplicarFiltros() {
             coincideEstado = estadoReal === estado;
         }
         
-        // Filtro rango precio
-        const coincideRango = h.precioNoche <= rango;
-        
-        return coincideBusqueda && coincideTipo && coincideEstado && coincideRango;
+        return coincideBusqueda && coincideTipo && coincideEstado;
     });
     
+    console.log('Habitaciones filtradas:', habitacionesFiltradas.length, 'de', habitaciones.length);
     renderizarTabla();
 }
 
@@ -140,10 +215,30 @@ function renderizarTabla() {
         return;
     }
     
-    const habitacionesAMostrar = habitacionesFiltradas.length > 0 ? habitacionesFiltradas : habitaciones;
+    // Verificar si hay filtros activos
+    const buscarInput = document.getElementById('buscarHabitacion');
+    const filtroTipoSelect = document.getElementById('filtroTipo');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    const hayFiltrosActivos = (buscarInput?.value?.trim() || '') !== '' ||
+                              (filtroTipoSelect?.value || '') !== '' ||
+                              (filtroEstadoSelect?.value || '') !== '';
+    
+    // Si hay filtros activos, usar habitacionesFiltradas (aunque esté vacío)
+    // Si no hay filtros, usar todas las habitaciones
+    const habitacionesAMostrar = hayFiltrosActivos ? habitacionesFiltradas : habitaciones;
+    
+    console.log('renderizarTabla() - habitacionesAMostrar:', habitacionesAMostrar.length);
     
     if (habitacionesAMostrar.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500"><span class="material-icons-outlined text-4xl">inbox</span><p class="mt-2">No hay habitaciones</p></td></tr>';
+        const mensaje = hayFiltrosActivos 
+            ? 'No se encontraron habitaciones con los filtros aplicados'
+            : 'No hay habitaciones registradas';
+        
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-gray-500">
+            <span class="material-icons-outlined text-4xl block mb-2">inbox</span>
+            <p class="mt-2">${mensaje}</p>
+            ${hayFiltrosActivos ? '<button onclick="limpiarFiltros()" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 transition text-sm">Limpiar Filtros</button>' : ''}
+        </td></tr>`;
         return;
     }
     
@@ -310,4 +405,27 @@ function exportarHabitaciones() {
     document.body.removeChild(link);
     
     mostrarNotificacion('✓ Habitaciones exportadas correctamente');
+}
+
+function limpiarFiltros() {
+    console.log('limpiarFiltros() llamado');
+    
+    const buscarInput = document.getElementById('buscarHabitacion');
+    const filtroTipoSelect = document.getElementById('filtroTipo');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    
+    if (buscarInput) {
+        buscarInput.value = '';
+    }
+    if (filtroTipoSelect) {
+        filtroTipoSelect.value = '';
+    }
+    if (filtroEstadoSelect) {
+        filtroEstadoSelect.value = '';
+    }
+    
+    habitacionesFiltradas = [];
+    aplicarFiltros();
+    
+    mostrarNotificacion('Filtros limpiados');
 }

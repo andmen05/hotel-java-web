@@ -142,7 +142,7 @@ function renderizarTabla() {
     const reservasAMostrar = reservasFiltradas.length > 0 ? reservasFiltradas : reservas;
     
     if (reservasAMostrar.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500"><i class="fas fa-inbox mr-2"></i>No hay reservas registradas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500"><span class="material-icons-outlined mr-2">inbox</span>No hay reservas registradas</td></tr>';
         return;
     }
     
@@ -167,10 +167,15 @@ function renderizarTabla() {
                            r.estado === 'Finalizada' ? 'bg-gray-100 text-gray-800 border border-gray-300' :
                            'bg-yellow-100 text-yellow-800 border border-yellow-300';
         
-        const estadoIcono = r.estado === 'Confirmada' ? 'fa-check-circle text-green-600' :
-                           r.estado === 'Cancelada' ? 'fa-times-circle text-red-600' :
-                           r.estado === 'Finalizada' ? 'fa-check-double text-gray-600' :
-                           'fa-clock text-yellow-600';
+        const estadoIcono = r.estado === 'Confirmada' ? 'check_circle' :
+                           r.estado === 'Cancelada' ? 'cancel' :
+                           r.estado === 'Finalizada' ? 'done_all' :
+                           'schedule';
+        
+        const estadoIconoColor = r.estado === 'Confirmada' ? 'text-green-600' :
+                                r.estado === 'Cancelada' ? 'text-red-600' :
+                                r.estado === 'Finalizada' ? 'text-gray-600' :
+                                'text-yellow-600';
         
         // Avatar del cliente
         const inicial = cliente ? cliente.nombre.charAt(0).toUpperCase() : '?';
@@ -197,7 +202,7 @@ function renderizarTabla() {
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex items-center space-x-2">
-                        <i class="fas fa-door-open text-blue-600"></i>
+                        <span class="material-icons-outlined text-blue-600">meeting_room</span>
                         <div>
                             <p class="text-sm font-semibold text-gray-900">${habitacion ? habitacion.idHabitacion : 'N/A'}</p>
                             <p class="text-xs text-gray-500">${habitacion ? habitacion.tipoHabitacion : 'N/A'}</p>
@@ -223,7 +228,7 @@ function renderizarTabla() {
                 </td>
                 <td class="px-6 py-4 text-center">
                     <span class="inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold ${estadoBadge}">
-                        <i class="fas ${estadoIcono}"></i>
+                        <span class="material-icons-outlined ${estadoIconoColor} text-sm">${estadoIcono}</span>
                         <span>${r.estado}</span>
                     </span>
                 </td>
@@ -231,12 +236,12 @@ function renderizarTabla() {
                     <p class="text-sm font-bold text-green-600">${formatearMoneda(total)}</p>
                 </td>
                 <td class="px-6 py-4 text-center">
-                    <div class="flex justify-center space-x-2">
-                        <button onclick="editarReserva(${r.id})" class="text-blue-600 hover:text-blue-800 hover:bg-blue-100 p-2 rounded-lg transition" title="Editar">
-                            <i class="fas fa-edit"></i>
+                    <div class="flex justify-center items-center space-x-2">
+                        <button onclick="editarReserva(${r.id})" class="text-blue-600 hover:text-blue-800 hover:bg-blue-100 p-2 rounded-lg transition flex items-center justify-center" title="Editar">
+                            <span class="material-icons-outlined text-lg">edit</span>
                         </button>
-                        <button onclick="eliminarReserva(${r.id})" class="text-red-600 hover:text-red-800 hover:bg-red-100 p-2 rounded-lg transition" title="Eliminar">
-                            <i class="fas fa-trash"></i>
+                        <button onclick="eliminarReserva(${r.id})" class="text-red-600 hover:text-red-800 hover:bg-red-100 p-2 rounded-lg transition flex items-center justify-center" title="Eliminar">
+                            <span class="material-icons-outlined text-lg">delete</span>
                         </button>
                     </div>
                 </td>

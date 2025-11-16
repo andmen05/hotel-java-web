@@ -448,6 +448,238 @@ function abrirModalCheckOut(idCheckin) {
 
 function cerrarModalCheckOut() {
     document.getElementById('modalCheckOut').classList.add('hidden');
+    document.getElementById('modalFactura').classList.add('hidden');
+}
+
+async function generarFactura(checkIn, cliente, habitacion, ventas) {
+    // Cargar productos si no están disponibles
+    let productos = [];
+    try {
+        productos = await fetchData('productos?action=listar') || [];
+    } catch (e) {
+        console.error('Error al cargar productos:', e);
+    }
+    
+    // Formatear fechas
+    const fechaIngreso = new Date(checkIn.fechaIngresoCheckin);
+    const fechaSalida = new Date(checkIn.fechaSalidaChecking);
+    
+    // Calcular total de habitación
+    const totalHabitacion = (habitacion?.precioNoche || 0) * checkIn.noches;
+    
+    // Calcular totales de ventas
+    let totalVentas = 0;
+    let iva5Total = 0;
+    let iva19Total = 0;
+    let totalConsumos = 0;
+    
+    const itemsVentas = [];
+    ventas.forEach(venta => {
+        const subtotalVenta = venta.total - (venta.iva5 || 0) - (venta.iva19 || 0);
+        totalVentas += venta.total;
+        iva5Total += venta.iva5 || 0;
+        iva19Total += venta.iva19 || 0;
+        totalConsumos += subtotalVenta;
+        
+        // Agregar productos de la venta
+        if (venta.productos && venta.productos.length > 0) {
+            venta.productos.forEach(pv => {
+                const producto = productos.find(p => p.id === pv.idProducto);
+                const subtotalItem = pv.cantidad * pv.precioUnitario;
+                itemsVentas.push({
+                    descripcion: producto ? producto.descripcion : `Producto #${pv.idProducto}`,
+                    cantidad: pv.cantidad,
+                    precioUnitario: pv.precioUnitario,
+                    subtotal: subtotalItem,
+                    iva: producto ? producto.iva : 0
+                });
+            });
+        } else {
+            // Si no hay productos, mostrar como consumo general
+            itemsVentas.push({
+                descripcion: `Consumo - ${new Date(venta.fecha).toLocaleString('es-ES')}`,
+                cantidad: 1,
+                precioUnitario: subtotalVenta,
+                subtotal: subtotalVenta,
+                iva: 0
+            });
+        }
+    });
+    
+    // Calcular totales finales
+    const subtotalHabitacion = totalHabitacion;
+    const subtotalConsumos = totalConsumos;
+    const subtotalGeneral = subtotalHabitacion + subtotalConsumos;
+    const totalIVA = iva5Total + iva19Total;
+    const totalFinal = subtotalGeneral + totalIVA;
+    
+    // Generar HTML de la factura
+    const facturaHTML = `
+        <div class="max-w-4xl mx-auto bg-white p-8">
+            <!-- Encabezado -->
+            <div class="border-b-4 border-indigo-600 pb-6 mb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">FACTURA</h1>
+                        <p class="text-sm text-gray-600">Sistema Hotelero</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600">Factura #${checkIn.idCheckin}</p>
+                        <p class="text-sm text-gray-600">${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Datos del Cliente -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-700 mb-2">CLIENTE</h3>
+                    <p class="text-sm text-gray-900 font-semibold">${cliente ? cliente.nombre + ' ' + cliente.apellido : 'N/A'}</p>
+                    <p class="text-xs text-gray-600">Documento: ${cliente ? cliente.documento : 'N/A'}</p>
+                    <p class="text-xs text-gray-600">${cliente ? cliente.correo || '' : ''}</p>
+                    <p class="text-xs text-gray-600">${cliente ? cliente.telefono || '' : ''}</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-700 mb-2">ESTADÍA</h3>
+                    <p class="text-sm text-gray-900">Habitación: <span class="font-semibold">${habitacion ? habitacion.idHabitacion : 'N/A'}</span></p>
+                    <p class="text-xs text-gray-600">Tipo: ${habitacion ? habitacion.tipoHabitacion : 'N/A'}</p>
+                    <p class="text-xs text-gray-600">Ingreso: ${fechaIngreso.toLocaleString('es-ES')}</p>
+                    <p class="text-xs text-gray-600">Salida: ${fechaSalida.toLocaleString('es-ES')}</p>
+                    <p class="text-xs text-gray-600">Noches: <span class="font-semibold">${checkIn.noches}</span></p>
+                </div>
+            </div>
+            
+            <!-- Detalle de Habitación -->
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-gray-700 mb-3">DETALLE DE HABITACIÓN</h3>
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Descripción</th>
+                            <th class="px-4 py-2 text-center font-semibold text-gray-700">Cantidad</th>
+                            <th class="px-4 py-2 text-right font-semibold text-gray-700">Precio Unitario</th>
+                            <th class="px-4 py-2 text-right font-semibold text-gray-700">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="px-4 py-3 text-gray-900">Habitación ${habitacion ? habitacion.idHabitacion : 'N/A'} - ${habitacion ? habitacion.tipoHabitacion : 'N/A'}</td>
+                            <td class="px-4 py-3 text-center text-gray-700">${checkIn.noches} noche(s)</td>
+                            <td class="px-4 py-3 text-right text-gray-700">${formatearMoneda(habitacion?.precioNoche || 0)}</td>
+                            <td class="px-4 py-3 text-right font-semibold text-gray-900">${formatearMoneda(totalHabitacion)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Detalle de Consumos -->
+            ${itemsVentas.length > 0 ? `
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-gray-700 mb-3">CONSUMOS A HABITACIÓN</h3>
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-semibold text-gray-700">Descripción</th>
+                            <th class="px-4 py-2 text-center font-semibold text-gray-700">Cantidad</th>
+                            <th class="px-4 py-2 text-right font-semibold text-gray-700">Precio Unitario</th>
+                            <th class="px-4 py-2 text-right font-semibold text-gray-700">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        ${itemsVentas.map(item => `
+                            <tr>
+                                <td class="px-4 py-3 text-gray-900">${item.descripcion}</td>
+                                <td class="px-4 py-3 text-center text-gray-700">${item.cantidad}</td>
+                                <td class="px-4 py-3 text-right text-gray-700">${formatearMoneda(item.precioUnitario)}</td>
+                                <td class="px-4 py-3 text-right font-semibold text-gray-900">${formatearMoneda(item.subtotal)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            ` : '<div class="mb-6"><p class="text-sm text-gray-500 italic">No hay consumos registrados</p></div>'}
+            
+            <!-- Totales -->
+            <div class="border-t-2 border-gray-300 pt-4">
+                <div class="flex justify-end">
+                    <div class="w-80 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">Subtotal Habitación:</span>
+                            <span class="font-semibold text-gray-900">${formatearMoneda(subtotalHabitacion)}</span>
+                        </div>
+                        ${subtotalConsumos > 0 ? `
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">Subtotal Consumos:</span>
+                            <span class="font-semibold text-gray-900">${formatearMoneda(subtotalConsumos)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">Subtotal:</span>
+                            <span class="font-semibold text-gray-900">${formatearMoneda(subtotalGeneral)}</span>
+                        </div>
+                        ${iva5Total > 0 ? `
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">IVA 5%:</span>
+                            <span class="font-semibold text-gray-900">${formatearMoneda(iva5Total)}</span>
+                        </div>
+                        ` : ''}
+                        ${iva19Total > 0 ? `
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">IVA 19%:</span>
+                            <span class="font-semibold text-gray-900">${formatearMoneda(iva19Total)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="flex justify-between text-lg font-bold border-t-2 border-gray-400 pt-2 mt-2">
+                            <span class="text-gray-900">TOTAL A PAGAR:</span>
+                            <span class="text-indigo-600">${formatearMoneda(totalFinal)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pie de página -->
+            <div class="mt-8 pt-6 border-t text-center text-xs text-gray-500">
+                <p>Gracias por su estadía. ¡Esperamos verlo pronto!</p>
+            </div>
+        </div>
+    `;
+    
+    // Mostrar en modal
+    const modalFactura = document.getElementById('modalFactura');
+    const contenidoFactura = document.getElementById('contenidoFactura');
+    if (modalFactura && contenidoFactura) {
+        contenidoFactura.innerHTML = facturaHTML;
+        modalFactura.classList.remove('hidden');
+    }
+}
+
+function cerrarModalFactura() {
+    document.getElementById('modalFactura').classList.add('hidden');
+}
+
+function imprimirFactura() {
+    const contenido = document.getElementById('contenidoFactura').innerHTML;
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Factura</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background-color: #f2f2f2; }
+                .total { font-weight: bold; font-size: 1.2em; }
+            </style>
+        </head>
+        <body>
+            ${contenido}
+        </body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.print();
 }
 
 async function hacerCheckOut(event) {
@@ -468,8 +700,18 @@ async function hacerCheckOut(event) {
         const result = await response.json();
         
         if (result.success) {
+            // Obtener datos completos para la factura
+            const checkIn = result.checkIn;
+            const ventas = result.ventas || [];
+            
+            // Obtener datos del cliente y habitación
+            const cliente = clientes.find(c => c.id === checkIn.idCliente);
+            const habitacion = habitaciones.find(h => h.id === checkIn.habitacion);
+            
+            // Generar y mostrar factura
+            generarFactura(checkIn, cliente, habitacion, ventas);
+            
             mostrarNotificacion('✅ Check-out realizado correctamente - Habitación DISPONIBLE');
-            cerrarModalCheckOut();
             await cargarDatos();
             await cargarCheckInsActivos();
         } else {

@@ -98,15 +98,26 @@
                     <h2 class="text-2xl font-bold text-gray-900">Check-in / Check-out</h2>
                     <p class="text-sm text-gray-500">Registro de entrada y salida de huéspedes</p>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 relative">
                     <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <span class="material-icons-outlined">notifications</span>
                     </button>
                     <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <span class="material-icons-outlined">settings</span>
                     </button>
-                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+                    <button id="avatarBtn" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:ring-2 hover:ring-primary hover:ring-offset-2 transition-all relative">
                         <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
+                    </button>
+                    <!-- Menú desplegable del usuario -->
+                    <div id="userMenu" class="hidden absolute right-0 top-14 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <a href="perfil.jsp" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">person</span>
+                            <span>Mi Perfil</span>
+                        </a>
+                        <a href="logout" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                            <span class="material-icons-outlined mr-3 text-lg">logout</span>
+                            <span>Cerrar Sesión</span>
+                        </a>
                     </div>
                 </div>
             </header>
@@ -327,6 +338,50 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Factura -->
+    <div id="modalFactura" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl my-8">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-6 sticky top-0 z-10">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <span class="material-icons-outlined text-3xl">receipt_long</span>
+                        <div>
+                            <h3 class="text-2xl font-bold">Factura de Check-out</h3>
+                            <p class="text-indigo-100 text-xs">Detalle completo de la estadía</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="imprimirFactura()" class="text-white hover:bg-indigo-800 p-2 rounded-lg transition" title="Imprimir">
+                            <span class="material-icons-outlined">print</span>
+                        </button>
+                        <button onclick="cerrarModalFactura()" class="text-white hover:bg-indigo-800 p-2 rounded-lg transition">
+                            <span class="material-icons-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div id="contenidoFactura">
+                    <!-- La factura se generará aquí dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 p-6 border-t flex justify-end space-x-3">
+                <button onclick="cerrarModalFactura()" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition font-semibold">
+                    Cerrar
+                </button>
+                <button onclick="imprimirFactura()" class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg transition font-semibold flex items-center space-x-2">
+                    <span class="material-icons-outlined">print</span>
+                    <span>Imprimir Factura</span>
+                </button>
+            </div>
         </div>
     </div>
 

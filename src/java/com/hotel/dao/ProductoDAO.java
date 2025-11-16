@@ -28,7 +28,11 @@ public class ProductoDAO {
             ps.setInt(6, producto.getExistencia());
             ps.setLong(7, producto.getIdUsuario());
             ps.setInt(8, producto.getCodCategoria());
-            ps.setDate(9, producto.getVencimiento());
+            if (producto.getVencimiento() != null) {
+                ps.setDate(9, producto.getVencimiento());
+            } else {
+                ps.setNull(9, java.sql.Types.DATE);
+            }
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error al insertar producto: " + e.getMessage());

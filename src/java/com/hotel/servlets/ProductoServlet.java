@@ -74,8 +74,15 @@ public class ProductoServlet extends HttpServlet {
                 producto.setIdUsuario(Long.parseLong(request.getParameter("idUsuario")));
                 producto.setCodCategoria(Integer.parseInt(request.getParameter("codCategoria")));
                 String vencimientoStr = request.getParameter("vencimiento");
-                if (vencimientoStr != null && !vencimientoStr.isEmpty()) {
-                    producto.setVencimiento(Date.valueOf(vencimientoStr));
+                if (vencimientoStr != null && !vencimientoStr.trim().isEmpty()) {
+                    try {
+                        producto.setVencimiento(Date.valueOf(vencimientoStr));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error al parsear fecha de vencimiento: " + vencimientoStr);
+                        producto.setVencimiento(null);
+                    }
+                } else {
+                    producto.setVencimiento(null);
                 }
 
                 boolean resultado = productoDAO.insertar(producto);
@@ -92,8 +99,15 @@ public class ProductoServlet extends HttpServlet {
                 producto.setIdUsuario(Long.parseLong(request.getParameter("idUsuario")));
                 producto.setCodCategoria(Integer.parseInt(request.getParameter("codCategoria")));
                 String vencimientoStr = request.getParameter("vencimiento");
-                if (vencimientoStr != null && !vencimientoStr.isEmpty()) {
-                    producto.setVencimiento(Date.valueOf(vencimientoStr));
+                if (vencimientoStr != null && !vencimientoStr.trim().isEmpty()) {
+                    try {
+                        producto.setVencimiento(Date.valueOf(vencimientoStr));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Error al parsear fecha de vencimiento: " + vencimientoStr);
+                        producto.setVencimiento(null);
+                    }
+                } else {
+                    producto.setVencimiento(null);
                 }
 
                 boolean resultado = productoDAO.actualizar(producto);

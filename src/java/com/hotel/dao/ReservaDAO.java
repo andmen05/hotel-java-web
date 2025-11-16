@@ -89,6 +89,18 @@ public class ReservaDAO {
         return reservas;
     }
 
+    public boolean actualizarEstadoPorHabitacion(int habitacionId, String nuevoEstado) {
+        String sql = "UPDATE proyecto_reservas SET estado=? WHERE habitacion=? AND estado='Confirmada'";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, nuevoEstado);
+            ps.setInt(2, habitacionId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar estado de reserva: " + e.getMessage());
+            return false;
+        }
+    }
+
     public int getTotalReservas() {
         String sql = "SELECT COUNT(*) as total FROM proyecto_reservas";
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {

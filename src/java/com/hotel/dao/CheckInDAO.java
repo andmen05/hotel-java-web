@@ -80,7 +80,13 @@ public class CheckInDAO {
                 CheckIn checkIn = buscarPorId(idCheckin);
                 if (checkIn != null) {
                     actualizarEstadoHabitacion(checkIn.getHabitacion(), "Disponible", null);
+                    
+                    // Actualizar estado de la reserva a "Finalizada"
+                    ReservaDAO reservaDAO = new ReservaDAO();
+                    reservaDAO.actualizarEstadoPorHabitacion(checkIn.getHabitacion(), "Finalizada");
+                    
                     System.out.println("✓ Check-out realizado - Habitación " + checkIn.getHabitacion() + " marcada como DISPONIBLE");
+                    System.out.println("✓ Reserva actualizada a FINALIZADA");
                 }
             }
             

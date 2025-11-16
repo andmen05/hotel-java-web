@@ -3,16 +3,43 @@
 let clientes = [];
 let clientesFiltrados = [];
 let reservas = [];
+let habitaciones = [];
 
 // Cargar clientes al iniciar
 document.addEventListener('DOMContentLoaded', () => {
     console.log('👥 Clientes - Inicializando...');
     cargarDatos();
     
-    // Event listeners para filtros
-    document.getElementById('buscarCliente')?.addEventListener('input', aplicarFiltros);
-    document.getElementById('filtroTipo')?.addEventListener('change', aplicarFiltros);
-    document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
+    // Event listeners para filtros - con delay para mejor rendimiento
+    const buscarInput = document.getElementById('buscarCliente');
+    const filtroEstado = document.getElementById('filtroEstado');
+    
+    if (buscarInput) {
+        // Búsqueda en tiempo real mientras escribes
+        buscarInput.addEventListener('input', (e) => {
+            console.log('Búsqueda activada:', e.target.value);
+            aplicarFiltros();
+        });
+        
+        // También aplicar filtros al hacer Enter o perder el foco
+        buscarInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                aplicarFiltros();
+            }
+        });
+        
+        buscarInput.addEventListener('blur', () => {
+            aplicarFiltros();
+        });
+    }
+    
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', () => {
+            console.log('Filtro de estado cambiado:', filtroEstado.value);
+            aplicarFiltros();
+        });
+    }
     
     // Actualizar cada 5 segundos
     setInterval(cargarDatos, 5000);
@@ -29,15 +56,21 @@ async function cargarDatos() {
         
         console.log('Iniciando carga de datos de clientes...');
         
-        const [clientesData, reservasData] = await Promise.all([
+        const [clientesData, reservasData, habitacionesData] = await Promise.all([
             fetchData('clientes?action=listar').catch(e => { console.error('Error clientes:', e); return []; }),
-            fetchData('reservas?action=listar').catch(e => { console.error('Error reservas:', e); return []; })
+            fetchData('reservas?action=listar').catch(e => { console.error('Error reservas:', e); return []; }),
+            fetchData('habitaciones?action=listar').catch(e => { console.error('Error habitaciones:', e); return []; })
         ]);
         
         clientes = clientesData || [];
         reservas = reservasData || [];
+        habitaciones = habitacionesData || [];
         
-        console.log('✓ Datos obtenidos del servidor:', { clientesCount: clientes.length, reservasCount: reservas.length });
+        console.log('✓ Datos obtenidos del servidor:', { 
+            clientesCount: clientes.length, 
+            reservasCount: reservas.length,
+            habitacionesCount: habitaciones.length 
+        });
         
         // Calcular estadísticas
         const totalClientes = clientes.length;
@@ -47,19 +80,41 @@ async function cargarDatos() {
             reservas.filter(r => r.estado === 'Confirmada').map(r => r.idCliente)
         ).size;
         
-        // Nuevos este mes
+        // Nuevos este mes - como no tenemos created_at en el modelo, 
+        // contamos todos los clientes (o podemos cambiarlo a otra métrica)
+        // Por ahora, contamos clientes que tienen reservas en el último mes
         const hoy = new Date();
-        const hace30Dias = new Date(hoy.getTime() - 30 * 24 * 60 * 60 * 1000);
-        const clientesNuevos = clientes.filter(c => {
-            if (!c.fechaRegistro) return false;
-            const fecha = new Date(c.fechaRegistro);
-            return fecha >= hace30Dias && fecha <= hoy;
-        }).length;
+        hoy.setHours(0, 0, 0, 0);
+        const hace30Dias = new Date(hoy);
+        hace30Dias.setDate(hace30Dias.getDate() - 30);
         
-        // Ingresos totales (suma de todas las reservas confirmadas)
+        const clientesConReservasRecientes = new Set(
+            reservas.filter(r => {
+                if (r.estado !== 'Confirmada') return false;
+                const fechaEntrada = new Date(r.fechaEntrada);
+                fechaEntrada.setHours(0, 0, 0, 0);
+                return fechaEntrada >= hace30Dias && fechaEntrada <= hoy;
+            }).map(r => r.idCliente)
+        ).size;
+        
+        // Usar clientes con reservas recientes como "nuevos este mes"
+        const clientesNuevos = clientesConReservasRecientes;
+        
+        // Ingresos totales - calcular basándose en noches * precio_noche
         const ingresosTotales = reservas
             .filter(r => r.estado === 'Confirmada')
-            .reduce((sum, r) => sum + (r.total || 0), 0);
+            .reduce((sum, r) => {
+                const habitacion = habitaciones.find(h => h.id === r.habitacion);
+                if (!habitacion) return sum;
+                
+                const fechaEntrada = new Date(r.fechaEntrada);
+                const fechaSalida = new Date(r.fechaSalida);
+                const noches = Math.ceil((fechaSalida - fechaEntrada) / (1000 * 60 * 60 * 24));
+                const precioNoche = habitacion.precioNoche || 0;
+                const totalReserva = noches * precioNoche;
+                
+                return sum + totalReserva;
+            }, 0);
         
         // Actualizar KPI
         const totalEl = document.getElementById('totalClientes');
@@ -74,10 +129,9 @@ async function cargarDatos() {
         
         console.log('✓ KPI actualizados:', { totalClientes, clientesActivos, clientesNuevos, ingresosTotales });
         
-        // Limpiar filtros y mostrar todos
-        console.log('Limpiando filtros y renderizando tabla...');
-        clientesFiltrados = [];
-        console.log('Array clientes antes de aplicarFiltros:', clientes);
+        // Aplicar filtros actuales (o mostrar todos si no hay filtros)
+        // Preservar el valor de búsqueda si existe
+        console.log('Aplicando filtros y renderizando tabla...');
         aplicarFiltros();
     } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -89,37 +143,75 @@ function aplicarFiltros() {
     console.log('aplicarFiltros() llamado');
     console.log('clientes disponibles:', clientes.length);
     
-    const busqueda = document.getElementById('buscarCliente')?.value.toLowerCase() || '';
-    const tipo = document.getElementById('filtroTipo')?.value || '';
-    const estado = document.getElementById('filtroEstado')?.value || '';
+    if (clientes.length === 0) {
+        console.warn('No hay clientes para filtrar');
+        const tbody = document.getElementById('tablaClientes');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500"><span class="material-icons-outlined text-4xl block mb-2">inbox</span><p class="mt-2">Cargando clientes...</p></td></tr>';
+        }
+        return;
+    }
     
-    console.log('Filtros:', { busqueda, tipo, estado });
+    const buscarInput = document.getElementById('buscarCliente');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    
+    if (!buscarInput) {
+        console.error('ERROR: No se encontró el campo buscarCliente');
+        return;
+    }
+    
+    const busqueda = buscarInput.value ? buscarInput.value.trim().toLowerCase() : '';
+    const estado = filtroEstadoSelect ? filtroEstadoSelect.value : '';
+    
+    console.log('Filtros aplicados:', { busqueda, estado, clientesCount: clientes.length });
     
     clientesFiltrados = clientes.filter(c => {
-        // Filtro búsqueda
-        const coincideBusqueda = !busqueda || 
-            (c.nombre && c.nombre.toLowerCase().includes(busqueda)) ||
-            (c.apellido && c.apellido.toLowerCase().includes(busqueda)) ||
-            (c.documento && c.documento.includes(busqueda)) ||
-            (c.correo && c.correo.toLowerCase().includes(busqueda));
-        
-        // Filtro tipo
-        const coincideTipo = !tipo || c.tipo === tipo;
-        
-        // Filtro estado
-        let coincideEstado = true;
-        if (estado === 'Activo') {
-            const tieneReserva = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
-            coincideEstado = tieneReserva;
-        } else if (estado === 'Inactivo') {
-            const tieneReserva = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
-            coincideEstado = !tieneReserva;
+        // Filtro búsqueda - busca en nombre, apellido, documento, correo y teléfono
+        let coincideBusqueda = true;
+        if (busqueda && busqueda.length > 0) {
+            // Normalizar y obtener valores de cada campo
+            const nombre = (c.nombre || '').toString().toLowerCase().trim();
+            const apellido = (c.apellido || '').toString().toLowerCase().trim();
+            const nombreCompleto = (nombre + ' ' + apellido).trim();
+            const documento = c.documento ? String(c.documento) : '';
+            const correo = (c.correo || '').toString().toLowerCase().trim();
+            const telefono = (c.telefono || '').toString().toLowerCase().trim();
+            
+            // Buscar en todos los campos (documento sin toLowerCase porque es numérico)
+            coincideBusqueda = 
+                nombre.includes(busqueda) ||
+                apellido.includes(busqueda) ||
+                nombreCompleto.includes(busqueda) ||
+                documento.includes(busqueda) ||
+                correo.includes(busqueda) ||
+                telefono.includes(busqueda);
+            
+            // Log para debugging
+            if (!coincideBusqueda) {
+                console.log(`Cliente ${c.id} no coincide:`, {
+                    nombre, apellido, documento, correo, telefono, busqueda
+                });
+            }
         }
         
-        return coincideBusqueda && coincideTipo && coincideEstado;
+        // Filtro estado - Activo = tiene reservas confirmadas, Inactivo = no tiene reservas confirmadas
+        let coincideEstado = true;
+        if (estado === 'Activo') {
+            const tieneReservaActiva = reservas.some(r => 
+                r.idCliente === c.id && r.estado === 'Confirmada'
+            );
+            coincideEstado = tieneReservaActiva;
+        } else if (estado === 'Inactivo') {
+            const tieneReservaActiva = reservas.some(r => 
+                r.idCliente === c.id && r.estado === 'Confirmada'
+            );
+            coincideEstado = !tieneReservaActiva;
+        }
+        
+        return coincideBusqueda && coincideEstado;
     });
     
-    console.log('Clientes filtrados:', clientesFiltrados.length);
+    console.log('Clientes filtrados:', clientesFiltrados.length, 'de', clientes.length);
     renderizarTabla();
 }
 
@@ -273,13 +365,31 @@ function renderizarTabla() {
     console.log('clientesFiltrados:', clientesFiltrados.length);
     console.log('clientes:', clientes.length);
     
-    const clientesAMostrar = clientesFiltrados.length > 0 ? clientesFiltrados : clientes;
+    // Verificar si hay filtros activos
+    const buscarInput = document.getElementById('buscarCliente');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    const hayFiltrosActivos = (buscarInput?.value?.trim() || '') !== '' ||
+                              (filtroEstadoSelect?.value || '') !== '';
     
+    // Si hay filtros activos, usar clientesFiltrados (aunque esté vacío)
+    // Si no hay filtros, usar todos los clientes
+    const clientesAMostrar = hayFiltrosActivos ? clientesFiltrados : clientes;
+    
+    console.log('hayFiltrosActivos:', hayFiltrosActivos);
     console.log('clientesAMostrar:', clientesAMostrar.length);
     
     if (clientesAMostrar.length === 0) {
         console.warn('No hay clientes para mostrar');
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500"><span class="material-icons-outlined text-4xl">inbox</span><p class="mt-2">No hay clientes</p></td></tr>';
+        
+        const mensaje = hayFiltrosActivos 
+            ? 'No se encontraron clientes con los filtros aplicados'
+            : 'No hay clientes registrados';
+        
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-500">
+            <span class="material-icons-outlined text-4xl block mb-2">inbox</span>
+            <p class="mt-2">${mensaje}</p>
+            ${hayFiltrosActivos ? '<button onclick="limpiarFiltros()" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 transition text-sm">Limpiar Filtros</button>' : ''}
+        </td></tr>`;
         return;
     }
     
@@ -287,10 +397,21 @@ function renderizarTabla() {
         // Contar reservas del cliente
         const reservasCliente = reservas.filter(r => r.idCliente === c.id).length;
         
-        // Calcular total gastado
+        // Calcular total gastado - basándose en noches * precio_noche
         const totalGastado = reservas
             .filter(r => r.idCliente === c.id && r.estado === 'Confirmada')
-            .reduce((sum, r) => sum + (r.total || 0), 0);
+            .reduce((sum, r) => {
+                const habitacion = habitaciones.find(h => h.id === r.habitacion);
+                if (!habitacion) return sum;
+                
+                const fechaEntrada = new Date(r.fechaEntrada);
+                const fechaSalida = new Date(r.fechaSalida);
+                const noches = Math.ceil((fechaSalida - fechaEntrada) / (1000 * 60 * 60 * 24));
+                const precioNoche = habitacion.precioNoche || 0;
+                const totalReserva = noches * precioNoche;
+                
+                return sum + totalReserva;
+            }, 0);
         
         // Determinar si está activo
         const esActivo = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
@@ -334,7 +455,18 @@ function exportarClientes() {
         const reservasCliente = reservas.filter(r => r.idCliente === c.id).length;
         const totalGastado = reservas
             .filter(r => r.idCliente === c.id && r.estado === 'Confirmada')
-            .reduce((sum, r) => sum + (r.total || 0), 0);
+            .reduce((sum, r) => {
+                const habitacion = habitaciones.find(h => h.id === r.habitacion);
+                if (!habitacion) return sum;
+                
+                const fechaEntrada = new Date(r.fechaEntrada);
+                const fechaSalida = new Date(r.fechaSalida);
+                const noches = Math.ceil((fechaSalida - fechaEntrada) / (1000 * 60 * 60 * 24));
+                const precioNoche = habitacion.precioNoche || 0;
+                const totalReserva = noches * precioNoche;
+                
+                return sum + totalReserva;
+            }, 0);
         
         return [
             c.nombre + ' ' + c.apellido,
@@ -369,7 +501,21 @@ function exportarClientes() {
     mostrarNotificacion('✓ Clientes exportados correctamente');
 }
 
-function limpiarBusqueda() {
-    document.getElementById('buscarDocumento').value = '';
-    cargarDatos();
+function limpiarFiltros() {
+    console.log('limpiarFiltros() llamado');
+    
+    const buscarInput = document.getElementById('buscarCliente');
+    const filtroEstadoSelect = document.getElementById('filtroEstado');
+    
+    if (buscarInput) {
+        buscarInput.value = '';
+    }
+    if (filtroEstadoSelect) {
+        filtroEstadoSelect.value = '';
+    }
+    
+    clientesFiltrados = [];
+    aplicarFiltros();
+    
+    mostrarNotificacion('Filtros limpiados');
 }
