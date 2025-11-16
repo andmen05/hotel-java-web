@@ -27,7 +27,7 @@
                     </div>
                     <div>
                         <h1 class="text-lg font-bold">Hotel Paradise</h1>
-                        <p class="text-xs text-indigo-200">Sistema Moderno</p>
+                        <p class="text-xs text-indigo-200">andmen05</p>
                     </div>
                 </div>
             </div>
@@ -121,7 +121,7 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-indigo-100 text-sm">Miembro desde</p>
-                                <p class="text-2xl font-bold">2024</p>
+                                <p class="text-2xl font-bold">2025</p>
                             </div>
                         </div>
                     </div>

@@ -10,261 +10,202 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes - Sistema Hotelero</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Reportes y Análisis - Hotel Paradise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: "#4F46E5",
+                "background-light": "#F8FAFC",
+              },
+              fontFamily: {
+                display: ["Poppins", "sans-serif"],
+              },
+              borderRadius: {
+                DEFAULT: "0.75rem",
+              },
+            },
+          },
+        };
+    </script>
+    <style>
+        .material-icons-outlined {
+          font-size: inherit;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="font-display bg-background-light text-gray-700">
     <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-48 bg-gradient-to-b from-indigo-900 to-indigo-800 text-white shadow-2xl">
-            <div class="p-6 border-b border-indigo-700">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
-                        <i class="fas fa-hotel text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold">Hotel Paradise</h1>
-                        <p class="text-xs text-indigo-200">Sistema Moderno</p>
-                    </div>
+        <aside class="w-64 flex-shrink-0 bg-indigo-900 text-indigo-100 flex flex-col">
+            <div class="p-6 text-center">
+                <div class="bg-indigo-800 rounded-lg p-3 inline-flex items-center justify-center mb-2">
+                    <span class="material-icons-outlined text-4xl text-white">hotel</span>
                 </div>
+                <h1 class="text-xl font-bold text-white">Hotel Paradise</h1>
+                <p class="text-sm text-indigo-300">andmen05</p>
             </div>
-
-            <nav class="mt-8 space-y-2 px-4">
-                <a href="dashboard.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
+            <nav class="flex-1 px-4 space-y-2">
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="dashboard.jsp">
+                    <span class="material-icons-outlined mr-3">dashboard</span>
+                    Dashboard
                 </a>
-                <a href="clientes.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-users"></i>
-                    <span>Clientes</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="clientes.jsp">
+                    <span class="material-icons-outlined mr-3">people</span>
+                    Clientes
                 </a>
-                <a href="habitaciones.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-bed"></i>
-                    <span>Habitaciones</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="habitaciones.jsp">
+                    <span class="material-icons-outlined mr-3">king_bed</span>
+                    Habitaciones
                 </a>
-                <a href="reservas.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reservas</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="reservas.jsp">
+                    <span class="material-icons-outlined mr-3">book_online</span>
+                    Reservas
                 </a>
-                <a href="checkin.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Check-in</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="checkin.jsp">
+                    <span class="material-icons-outlined mr-3">login</span>
+                    Check-in
                 </a>
-                <a href="productos.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-utensils"></i>
-                    <span>Productos</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="productos.jsp">
+                    <span class="material-icons-outlined mr-3">restaurant</span>
+                    Productos
                 </a>
-                <a href="ventas.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Ventas</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="ventas.jsp">
+                    <span class="material-icons-outlined mr-3">shopping_cart</span>
+                    Ventas
                 </a>
-                <a href="reportes.jsp" class="flex items-center space-x-3 px-4 py-3 bg-indigo-700 rounded-lg hover:bg-indigo-600 transition">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
+                <a class="flex items-center px-4 py-2.5 bg-primary text-white rounded-lg font-semibold" href="reportes.jsp">
+                    <span class="material-icons-outlined mr-3">assessment</span>
+                    Reportes
                 </a>
             </nav>
-
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700 w-48">
-                <a href="logout" class="flex items-center space-x-3 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition w-full justify-center">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Salir</span>
+            <div class="p-4 mt-auto">
+                <a href="logout" class="w-full flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200">
+                    <span class="material-icons-outlined mr-2">logout</span>
+                    Salir
                 </a>
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
-            <div class="bg-white shadow-md px-8 py-4 flex justify-between items-center">
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="flex-shrink-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center sticky top-0 z-10">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Reportes y Análisis</h2>
-                    <p class="text-gray-600 text-sm">Visualiza datos y estadísticas del hotel</p>
+                    <h2 class="text-2xl font-bold text-gray-900">Reportes y Análisis</h2>
+                    <p class="text-sm text-gray-500">Visualiza datos y estadísticas del hotel</p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-bell text-gray-600 text-xl"></i>
+                    <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <span class="material-icons-outlined">notifications</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-cog text-gray-600 text-xl"></i>
+                    <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <span class="material-icons-outlined">settings</span>
                     </button>
-                    <!-- Avatar con Menú Desplegable -->
-                    <div class="relative">
-                        <button id="avatarBtn" class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold hover:shadow-lg transition cursor-pointer overflow-hidden">
-                            <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
-                        </button>
-                        <!-- Menú Desplegable -->
-                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 overflow-hidden">
-                            <!-- Header del Menú -->
-                            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-sm"><%= usuario.getNombre() != null ? usuario.getNombre() : "Usuario" %></p>
-                                        <p class="text-xs text-indigo-100">ID: <%= usuario.getId() %></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Opciones del Menú -->
-                            <div class="py-2">
-                                <a href="perfil.jsp" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 transition">
-                                    <i class="fas fa-user-circle text-indigo-600 w-5"></i>
-                                    <span>Mi Perfil</span>
-                                </a>
-                                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 transition">
-                                    <i class="fas fa-cog text-gray-600 w-5"></i>
-                                    <span>Configuración</span>
-                                </a>
-                                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 transition">
-                                    <i class="fas fa-question-circle text-gray-600 w-5"></i>
-                                    <span>Ayuda</span>
-                                </a>
-                                <hr class="my-2">
-                                <a href="logout" class="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 transition font-semibold">
-                                    <i class="fas fa-sign-out-alt w-5"></i>
-                                    <span>Cerrar Sesión</span>
-                                </a>
-                            </div>
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+                        <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-6 flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                        <div>
+                            <p class="text-sm text-gray-500">Ocupación</p>
+                            <p class="text-2xl font-bold text-gray-900" id="ocupacion">0%</p>
+                            <p class="text-xs text-gray-400">Habitaciones ocupadas</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                            <span class="material-icons-outlined text-2xl">hotel</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                        <div>
+                            <p class="text-sm text-gray-500">Ingresos Totales</p>
+                            <p class="text-2xl font-bold text-gray-900" id="ingresos">$0</p>
+                            <p class="text-xs text-gray-400">Este mes</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <span class="material-icons-outlined text-2xl">attach_money</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                        <div>
+                            <p class="text-sm text-gray-500">Clientes Activos</p>
+                            <p class="text-2xl font-bold text-gray-900" id="clientesActivos">0</p>
+                            <p class="text-xs text-gray-400">Huéspedes registrados</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                            <span class="material-icons-outlined text-2xl">groups</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                        <div>
+                            <p class="text-sm text-gray-500">Reservas Pendientes</p>
+                            <p class="text-2xl font-bold text-gray-900" id="reservasPendientes">0</p>
+                            <p class="text-xs text-gray-400">Próximos 30 días</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                            <span class="material-icons-outlined text-2xl">calendar_today</span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Scrollable Content -->
-            <div class="flex-1 overflow-auto">
-                <div class="p-8">
-                    <!-- KPI Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <!-- Ocupación -->
-                        <div class="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl p-6 text-white shadow-lg">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-cyan-100 text-sm font-semibold">Ocupación</p>
-                                    <h3 class="text-4xl font-bold mt-2" id="ocupacion">0%</h3>
-                                    <p class="text-cyan-100 text-xs mt-1">Habitaciones ocupadas</p>
-                                </div>
-                                <i class="fas fa-building text-4xl opacity-20"></i>
-                            </div>
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Informes Detallados</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col group border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="p-6 bg-blue-500 text-white flex-1 flex flex-col items-center justify-center text-center">
+                            <span class="material-icons-outlined text-5xl mb-2 opacity-80">show_chart</span>
+                            <h4 class="text-lg font-semibold">Reporte de Ventas</h4>
+                            <p class="text-sm opacity-90">Análisis de ventas por período</p>
                         </div>
-
-                        <!-- Ingresos -->
-                        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-6 text-white shadow-lg">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-emerald-100 text-sm font-semibold">Ingresos Totales</p>
-                                    <h3 class="text-4xl font-bold mt-2" id="ingresos">$0</h3>
-                                    <p class="text-emerald-100 text-xs mt-1">Este mes</p>
-                                </div>
-                                <i class="fas fa-dollar-sign text-4xl opacity-20"></i>
-                            </div>
-                        </div>
-
-                        <!-- Clientes -->
-                        <div class="bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl p-6 text-white shadow-lg">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-violet-100 text-sm font-semibold">Clientes Activos</p>
-                                    <h3 class="text-4xl font-bold mt-2" id="clientesActivos">0</h3>
-                                    <p class="text-violet-100 text-xs mt-1">Huéspedes registrados</p>
-                                </div>
-                                <i class="fas fa-users text-4xl opacity-20"></i>
-                            </div>
-                        </div>
-
-                        <!-- Reservas -->
-                        <div class="bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl p-6 text-white shadow-lg">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-rose-100 text-sm font-semibold">Reservas Pendientes</p>
-                                    <h3 class="text-4xl font-bold mt-2" id="reservasPendientes">0</h3>
-                                    <p class="text-rose-100 text-xs mt-1">Próximos 30 días</p>
-                                </div>
-                                <i class="fas fa-calendar-alt text-4xl opacity-20"></i>
-                            </div>
-                        </div>
+                        <button onclick="generarReporte('ventas')" class="block p-4 bg-gray-50 text-sm text-center text-blue-600 font-medium hover:bg-gray-100 transition-colors duration-200 w-full">Ver detalles</button>
                     </div>
-
-                    <!-- Reportes Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <!-- Reporte Ventas -->
-                        <button onclick="generarReporte('ventas')" class="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:scale-105">
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
-                                <i class="fas fa-chart-line text-4xl mb-4"></i>
-                                <h3 class="text-xl font-bold">Reporte de Ventas</h3>
-                                <p class="text-blue-100 text-xs mt-1">Análisis de ventas por período</p>
-                            </div>
-                            <div class="p-4 text-gray-600 text-sm">
-                                <i class="fas fa-arrow-right mr-2 text-blue-600"></i>Ver detalles
-                            </div>
-                        </button>
-
-                        <!-- Reporte Check-ins -->
-                        <button onclick="generarReporte('checkins')" class="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:scale-105">
-                            <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 text-white">
-                                <i class="fas fa-sign-in-alt text-4xl mb-4"></i>
-                                <h3 class="text-xl font-bold">Reporte de Check-ins</h3>
-                                <p class="text-green-100 text-xs mt-1">Entrada y salida de huéspedes</p>
-                            </div>
-                            <div class="p-4 text-gray-600 text-sm">
-                                <i class="fas fa-arrow-right mr-2 text-green-600"></i>Ver detalles
-                            </div>
-                        </button>
-
-                        <!-- Reporte Reservas -->
-                        <button onclick="generarReporte('reservas')" class="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:scale-105">
-                            <div class="bg-gradient-to-br from-amber-500 to-amber-600 p-6 text-white">
-                                <i class="fas fa-calendar-check text-4xl mb-4"></i>
-                                <h3 class="text-xl font-bold">Reporte de Reservas</h3>
-                                <p class="text-amber-100 text-xs mt-1">Estado de reservaciones</p>
-                            </div>
-                            <div class="p-4 text-gray-600 text-sm">
-                                <i class="fas fa-arrow-right mr-2 text-amber-600"></i>Ver detalles
-                            </div>
-                        </button>
-                    </div>
-
-                    <!-- Más Reportes -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <!-- Reporte Ocupación -->
-                        <button onclick="generarReporte('ocupacion')" class="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:scale-105">
-                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 text-white">
-                                <i class="fas fa-chart-pie text-4xl mb-4"></i>
-                                <h3 class="text-xl font-bold">Reporte de Ocupación</h3>
-                                <p class="text-indigo-100 text-xs mt-1">Análisis de ocupación por habitación</p>
-                            </div>
-                            <div class="p-4 text-gray-600 text-sm">
-                                <i class="fas fa-arrow-right mr-2 text-indigo-600"></i>Ver detalles
-                            </div>
-                        </button>
-
-                        <!-- Reporte Ingresos -->
-                        <button onclick="generarReporte('ingresos')" class="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:scale-105">
-                            <div class="bg-gradient-to-br from-teal-500 to-teal-600 p-6 text-white">
-                                <i class="fas fa-money-bill-wave text-4xl mb-4"></i>
-                                <h3 class="text-xl font-bold">Reporte de Ingresos</h3>
-                                <p class="text-teal-100 text-xs mt-1">Análisis financiero detallado</p>
-                            </div>
-                            <div class="p-4 text-gray-600 text-sm">
-                                <i class="fas fa-arrow-right mr-2 text-teal-600"></i>Ver detalles
-                            </div>
-                        </button>
-                    </div>
-
-                    <!-- Contenido Dinámico -->
-                    <div id="contenidoReporte" class="bg-white rounded-xl shadow-md p-8">
-                        <div class="text-center py-12">
-                            <i class="fas fa-chart-bar text-6xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500 text-lg">Selecciona un reporte para ver los datos y análisis</p>
-                            <p class="text-gray-400 text-sm mt-2">Los reportes se cargarán dinámicamente desde el servidor</p>
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col group border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="p-6 bg-green-500 text-white flex-1 flex flex-col items-center justify-center text-center">
+                            <span class="material-icons-outlined text-5xl mb-2 opacity-80">login</span>
+                            <h4 class="text-lg font-semibold">Reporte de Check-ins</h4>
+                            <p class="text-sm opacity-90">Entrada y salida de huéspedes</p>
                         </div>
+                        <button onclick="generarReporte('checkins')" class="block p-4 bg-gray-50 text-sm text-center text-green-600 font-medium hover:bg-gray-100 transition-colors duration-200 w-full">Ver detalles</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col group border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="p-6 bg-orange-500 text-white flex-1 flex flex-col items-center justify-center text-center">
+                            <span class="material-icons-outlined text-5xl mb-2 opacity-80">event_available</span>
+                            <h4 class="text-lg font-semibold">Reporte de Reservas</h4>
+                            <p class="text-sm opacity-90">Estado de reservaciones</p>
+                        </div>
+                        <button onclick="generarReporte('reservas')" class="block p-4 bg-gray-50 text-sm text-center text-orange-600 font-medium hover:bg-gray-100 transition-colors duration-200 w-full">Ver detalles</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col group border border-gray-100 cursor-pointer hover:shadow-md transition-shadow lg:col-span-1.5">
+                        <div class="p-6 bg-indigo-500 text-white flex-1 flex flex-col items-center justify-center text-center">
+                            <span class="material-icons-outlined text-5xl mb-2 opacity-80">pie_chart</span>
+                            <h4 class="text-lg font-semibold">Reporte de Ocupación</h4>
+                            <p class="text-sm opacity-90">Análisis de ocupación por habitación</p>
+                        </div>
+                        <button onclick="generarReporte('ocupacion')" class="block p-4 bg-gray-50 text-sm text-center text-indigo-600 font-medium hover:bg-gray-100 transition-colors duration-200 w-full">Ver detalles</button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col group border border-gray-100 cursor-pointer hover:shadow-md transition-shadow lg:col-span-1.5">
+                        <div class="p-6 bg-teal-500 text-white flex-1 flex flex-col items-center justify-center text-center">
+                            <span class="material-icons-outlined text-5xl mb-2 opacity-80">payments</span>
+                            <h4 class="text-lg font-semibold">Reporte de Ingresos</h4>
+                            <p class="text-sm opacity-90">Análisis financiero detallado</p>
+                        </div>
+                        <button onclick="generarReporte('ingresos')" class="block p-4 bg-gray-50 text-sm text-center text-teal-600 font-medium hover:bg-gray-100 transition-colors duration-200 w-full">Ver detalles</button>
+                    </div>
+                </div>
+                <!-- Contenedor de Reportes Dinámicos -->
+                <div id="contenidoReporte" class="mt-12 bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+                    <div class="text-center py-12">
+                        <span class="material-icons-outlined text-6xl text-gray-300">insights</span>
+                        <p class="text-gray-500 text-lg mt-4">Selecciona un reporte para ver los datos y análisis</p>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="js/common.js"></script>

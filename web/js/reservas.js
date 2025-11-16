@@ -2,6 +2,7 @@
 
 let reservas = [];
 let reservasOriginales = [];
+let reservasFiltradas = [];
 let clientes = [];
 let habitaciones = [];
 
@@ -9,41 +10,106 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📅 Reservas - Inicializando...');
     cargarDatos();
     
+    // Event listeners para filtros
+    document.getElementById('buscarReserva')?.addEventListener('input', aplicarFiltros);
+    document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroFechaEntrada')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroFechaSalida')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroHabitacion')?.addEventListener('change', aplicarFiltros);
+    
+    // Event listener para el formulario
+    const formReserva = document.getElementById('formReserva');
+    if (formReserva) {
+        // Remover el onsubmit del HTML si existe
+        formReserva.onsubmit = null;
+        formReserva.addEventListener('submit', guardarReserva);
+    }
+    
     // Actualizar grid cards cada 5 segundos
     setInterval(cargarDatos, 5000);
 });
 
 async function cargarDatos() {
     try {
-        [reservas, clientes, habitaciones] = await Promise.all([
-            fetchData('reservas?action=listar'),
-            fetchData('clientes?action=listar'),
-            fetchData('habitaciones?action=listar')
-        ]);
+        // No recargar si el modal está abierto
+        const modalAbierto = !document.getElementById('modalReserva')?.classList.contains('hidden');
+        if (modalAbierto) {
+            console.log('Modal abierto, saltando recarga de datos');
+            return;
+        }
         
-        reservas = reservas || [];
-        reservasOriginales = JSON.parse(JSON.stringify(reservas)); // Copia profunda
-        clientes = clientes || [];
-        habitaciones = habitaciones || [];
+        const nuevasReservas = await fetchData('reservas?action=listar') || [];
+        const nuevosClientes = await fetchData('clientes?action=listar') || [];
+        const nuevasHabitaciones = await fetchData('habitaciones?action=listar') || [];
+        
+        // Solo actualizar si los datos realmente cambiaron
+        if (JSON.stringify(reservas) !== JSON.stringify(nuevasReservas)) {
+            reservas = nuevasReservas;
+            reservasOriginales = JSON.parse(JSON.stringify(reservas)); // Copia profunda
+            reservasFiltradas = []; // Limpiar filtros cuando se cargan nuevas reservas
+            console.log('✓ Reservas actualizadas:', reservas.length);
+        }
+        
+        if (JSON.stringify(clientes) !== JSON.stringify(nuevosClientes)) {
+            clientes = nuevosClientes;
+            console.log('✓ Clientes actualizados:', clientes.length);
+        }
+        
+        if (JSON.stringify(habitaciones) !== JSON.stringify(nuevasHabitaciones)) {
+            habitaciones = nuevasHabitaciones;
+            console.log('✓ Habitaciones actualizadas:', habitaciones.length);
+        }
         
         // Calcular estadísticas
         const totalReservas = reservas.length;
         const confirmadas = reservas.filter(r => r.estado === 'Confirmada').length;
-        const canceladas = reservas.filter(r => r.estado === 'Cancelada').length;
-        const finalizadas = reservas.filter(r => r.estado === 'Finalizada').length;
+        const pendientes = reservas.filter(r => r.estado === 'Pendiente').length;
         
-        // Actualizar tarjetas de resumen si existen
+        // Ocupación hoy
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const mañana = new Date(hoy);
+        mañana.setDate(mañana.getDate() + 1);
+        
+        const ocupadasHoy = reservas.filter(r => {
+            const entrada = new Date(r.fechaEntrada);
+            entrada.setHours(0, 0, 0, 0);
+            const salida = new Date(r.fechaSalida);
+            salida.setHours(0, 0, 0, 0);
+            return entrada <= hoy && salida > hoy && r.estado === 'Confirmada';
+        }).length;
+        
+        const totalHabitaciones = habitaciones.length || 1;
+        const ocupacionPorcentaje = Math.round((ocupadasHoy / totalHabitaciones) * 100);
+        
+        // Ingresos proyectados (reservas confirmadas)
+        const ingresosProyectados = confirmadas * 150; // Promedio por noche
+        
+        // Actualizar tarjetas de resumen
         const totalEl = document.getElementById('totalReservas');
         const confirmadasEl = document.getElementById('reservasConfirmadas');
-        const canceladasEl = document.getElementById('reservasCanceladas');
-        const finalizadasEl = document.getElementById('reservasFinalizadas');
+        const pendientesEl = document.getElementById('reservasPendientes');
+        const ocupacionEl = document.getElementById('ocupacionHoy');
+        const ingresosEl = document.getElementById('ingresosProyectados');
         
         if (totalEl) totalEl.textContent = totalReservas;
         if (confirmadasEl) confirmadasEl.textContent = confirmadas;
-        if (canceladasEl) canceladasEl.textContent = canceladas;
-        if (finalizadasEl) finalizadasEl.textContent = finalizadas;
+        if (pendientesEl) pendientesEl.textContent = pendientes;
+        if (ocupacionEl) ocupacionEl.textContent = ocupacionPorcentaje + '%';
+        if (ingresosEl) ingresosEl.textContent = formatearMoneda(ingresosProyectados);
         
-        console.log('Reservas cargadas:', { totalReservas, confirmadas, canceladas, finalizadas });
+        // Llenar select de habitaciones en filtros
+        const filtroHabitacion = document.getElementById('filtroHabitacion');
+        if (filtroHabitacion && filtroHabitacion.options.length === 1) {
+            habitaciones.forEach(h => {
+                const option = document.createElement('option');
+                option.value = h.id;
+                option.textContent = h.idHabitacion + ' - ' + h.tipoHabitacion;
+                filtroHabitacion.appendChild(option);
+            });
+        }
+        
+        console.log('✓ Reservas cargadas:', { totalReservas, confirmadas, pendientes, ocupacionPorcentaje });
         
         // Llenar selects
         const selectCliente = document.getElementById('clienteReserva');
@@ -72,14 +138,17 @@ function renderizarTabla() {
         return;
     }
     
-    if (reservas.length === 0) {
+    // Usar reservasFiltradas si hay filtros aplicados, sino usar reservas
+    const reservasAMostrar = reservasFiltradas.length > 0 ? reservasFiltradas : reservas;
+    
+    if (reservasAMostrar.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500"><i class="fas fa-inbox mr-2"></i>No hay reservas registradas</td></tr>';
         return;
     }
     
-    console.log('Renderizando', reservas.length, 'reservas');
+    console.log('Renderizando', reservasAMostrar.length, 'reservas');
     
-    tbody.innerHTML = reservas.map(r => {
+    tbody.innerHTML = reservasAMostrar.map(r => {
         const cliente = clientes.find(c => c.id === r.idCliente);
         const habitacion = habitaciones.find(h => h.id === r.habitacion);
         
@@ -177,6 +246,14 @@ function renderizarTabla() {
 }
 
 function abrirModalNuevo() {
+    console.log('abrirModalNuevo() - Clientes:', clientes.length, 'Habitaciones:', habitaciones.length);
+    
+    // Validar que haya datos
+    if (clientes.length === 0 || habitaciones.length === 0) {
+        mostrarNotificacion('Cargando datos... Intenta de nuevo en un momento', 'error');
+        return;
+    }
+    
     document.getElementById('modalTitulo').textContent = 'Nueva Reserva';
     document.getElementById('formReserva').reset();
     document.getElementById('reservaId').value = '';
@@ -208,16 +285,32 @@ async function guardarReserva(event) {
     event.preventDefault();
     
     const id = document.getElementById('reservaId').value;
+    const idCliente = document.getElementById('clienteReserva').value;
+    const habitacion = document.getElementById('habitacionReserva').value;
+    const fechaEntrada = document.getElementById('fechaEntrada').value;
+    const fechaSalida = document.getElementById('fechaSalida').value;
+    const tipoReserva = document.getElementById('tipoReserva').value;
+    const estado = document.getElementById('estadoReserva').value;
+    
+    // Validar campos
+    if (!idCliente || !habitacion || !fechaEntrada || !fechaSalida || !tipoReserva || !estado) {
+        mostrarNotificacion('Por favor completa todos los campos requeridos', 'error');
+        console.warn('Campos faltantes:', { idCliente, habitacion, fechaEntrada, fechaSalida, tipoReserva, estado });
+        return;
+    }
+    
     const formData = new URLSearchParams({
         action: id ? 'actualizar' : 'insertar',
         id: id || '',
-        idCliente: document.getElementById('clienteReserva').value,
-        habitacion: document.getElementById('habitacionReserva').value,
-        fechaEntrada: document.getElementById('fechaEntrada').value,
-        fechaSalida: document.getElementById('fechaSalida').value,
-        tipoReserva: document.getElementById('tipoReserva').value,
-        estado: document.getElementById('estadoReserva').value
+        idCliente: idCliente,
+        habitacion: habitacion,
+        fechaEntrada: fechaEntrada,
+        fechaSalida: fechaSalida,
+        tipoReserva: tipoReserva,
+        estado: estado
     });
+    
+    console.log('Guardando reserva:', Object.fromEntries(formData));
     
     try {
         const response = await fetch('reservas', {
@@ -227,16 +320,19 @@ async function guardarReserva(event) {
         });
         const result = await response.json();
         
+        console.log('Respuesta del servidor:', result);
+        
         if (result.success) {
-            mostrarNotificacion(id ? 'Reserva actualizada correctamente' : 'Reserva creada correctamente');
+            mostrarNotificacion(id ? '✓ Reserva actualizada' : '✓ Reserva creada');
             cerrarModal();
-            cargarDatos();
+            await cargarDatos();
         } else {
-            mostrarNotificacion('Error al guardar reserva', 'error');
+            console.error('Error en respuesta:', result);
+            mostrarNotificacion(result.error || 'Error al guardar reserva', 'error');
         }
     } catch (error) {
-        console.error('Error:', error);
-        mostrarNotificacion('Error al guardar reserva', 'error');
+        console.error('Error al guardar:', error);
+        mostrarNotificacion('Error al guardar reserva: ' + error.message, 'error');
     }
 }
 
@@ -261,67 +357,98 @@ async function eliminarReserva(id) {
 
 // Funciones de Filtrado
 function aplicarFiltros() {
-    const estado = document.getElementById('filtroEstado').value;
-    const fechaEntrada = document.getElementById('filtroFechaEntrada').value;
-    const fechaSalida = document.getElementById('filtroFechaSalida').value;
-    const busqueda = document.getElementById('filtroBusqueda').value.toLowerCase();
+    const busqueda = document.getElementById('buscarReserva')?.value.toLowerCase() || '';
+    const estado = document.getElementById('filtroEstado')?.value || '';
+    const fechaEntrada = document.getElementById('filtroFechaEntrada')?.value || '';
+    const fechaSalida = document.getElementById('filtroFechaSalida')?.value || '';
+    const habitacion = document.getElementById('filtroHabitacion')?.value || '';
     
-    console.log('Aplicando filtros:', { estado, fechaEntrada, fechaSalida, busqueda });
-    
-    reservas = reservasOriginales.filter(r => {
-        // Filtro por estado
-        if (estado && r.estado !== estado) {
-            return false;
-        }
+    reservasFiltradas = reservasOriginales.filter(r => {
+        // Filtro búsqueda
+        const cliente = clientes.find(c => c.id === r.idCliente);
+        const coincideBusqueda = !busqueda || 
+            (cliente && (cliente.nombre.toLowerCase().includes(busqueda) || cliente.apellido.toLowerCase().includes(busqueda))) ||
+            r.id.toString().includes(busqueda);
         
-        // Filtro por fecha de entrada
-        if (fechaEntrada) {
-            const fechaR = new Date(r.fechaEntrada).toISOString().split('T')[0];
-            if (fechaR !== fechaEntrada) {
-                return false;
-            }
-        }
+        // Filtro estado
+        const coincideEstado = !estado || r.estado === estado;
         
-        // Filtro por fecha de salida
-        if (fechaSalida) {
-            const fechaR = new Date(r.fechaSalida).toISOString().split('T')[0];
-            if (fechaR !== fechaSalida) {
-                return false;
-            }
-        }
+        // Filtro fecha entrada
+        const coincideFechaEntrada = !fechaEntrada || r.fechaEntrada.startsWith(fechaEntrada);
         
-        // Filtro por búsqueda (cliente, habitación, ID)
-        if (busqueda) {
-            const cliente = clientes.find(c => c.id === r.idCliente);
-            const habitacion = habitaciones.find(h => h.id === r.habitacion);
-            
-            const clienteNombre = cliente ? (cliente.nombre + ' ' + cliente.apellido).toLowerCase() : '';
-            const habitacionId = habitacion ? habitacion.idHabitacion.toString() : '';
-            const reservaId = r.id.toString();
-            
-            if (!clienteNombre.includes(busqueda) && 
-                !habitacionId.includes(busqueda) && 
-                !reservaId.includes(busqueda)) {
-                return false;
-            }
-        }
+        // Filtro fecha salida
+        const coincideFechaSalida = !fechaSalida || r.fechaSalida.startsWith(fechaSalida);
         
-        return true;
+        // Filtro habitación
+        const coincideHabitacion = !habitacion || r.habitacion == habitacion;
+        
+        return coincideBusqueda && coincideEstado && coincideFechaEntrada && coincideFechaSalida && coincideHabitacion;
     });
     
-    console.log('Reservas filtradas:', reservas.length);
     renderizarTabla();
 }
 
 function limpiarFiltros() {
+    document.getElementById('buscarReserva').value = '';
     document.getElementById('filtroEstado').value = '';
     document.getElementById('filtroFechaEntrada').value = '';
     document.getElementById('filtroFechaSalida').value = '';
-    document.getElementById('filtroBusqueda').value = '';
+    document.getElementById('filtroHabitacion').value = '';
     
-    reservas = JSON.parse(JSON.stringify(reservasOriginales));
-    console.log('Filtros limpios, mostrando todas las reservas');
+    reservasFiltradas = [];
     renderizarTabla();
+}
+
+function exportarReservas() {
+    if (reservasOriginales.length === 0) {
+        mostrarNotificacion('No hay reservas para exportar', 'error');
+        return;
+    }
+    
+    // Preparar datos
+    const reservasAExportar = reservasFiltradas.length > 0 ? reservasFiltradas : reservasOriginales;
+    
+    // Crear CSV
+    const headers = ['ID', 'Cliente', 'Email', 'Habitación', 'Tipo', 'Entrada', 'Salida', 'Noches', 'Estado', 'Total'];
+    const rows = reservasAExportar.map(r => {
+        const cliente = clientes.find(c => c.id === r.idCliente);
+        const habitacion = habitaciones.find(h => h.id === r.habitacion);
+        const noches = Math.ceil((new Date(r.fechaSalida) - new Date(r.fechaEntrada)) / (1000 * 60 * 60 * 24));
+        
+        return [
+            r.id,
+            cliente ? cliente.nombre + ' ' + cliente.apellido : 'N/A',
+            cliente ? cliente.email : 'N/A',
+            habitacion ? habitacion.idHabitacion : 'N/A',
+            habitacion ? habitacion.tipoHabitacion : 'N/A',
+            r.fechaEntrada,
+            r.fechaSalida,
+            noches,
+            r.estado,
+            r.total || '0'
+        ];
+    });
+    
+    // Crear contenido CSV
+    let csv = headers.join(',') + '\n';
+    rows.forEach(row => {
+        csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+    });
+    
+    // Descargar
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `reservas_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    mostrarNotificacion('✓ Reservas exportadas correctamente');
 }
 
 function filtrarPorPeriodo(periodo) {

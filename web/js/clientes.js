@@ -1,237 +1,148 @@
 // Gestión de Clientes
 
 let clientes = [];
+let clientesFiltrados = [];
+let reservas = [];
 
 // Cargar clientes al iniciar
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded - Inicializando clientes.js');
+    console.log('👥 Clientes - Inicializando...');
+    cargarDatos();
     
-    // Verificar que los elementos existan
-    const clientesGrid = document.getElementById('clientesGrid');
-    const buscarDocumento = document.getElementById('buscarDocumento');
+    // Event listeners para filtros
+    document.getElementById('buscarCliente')?.addEventListener('input', aplicarFiltros);
+    document.getElementById('filtroTipo')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
     
-    if (!clientesGrid) {
-        console.error('ERROR: No se encontró el elemento clientesGrid');
-        return;
-    }
-    
-    if (!buscarDocumento) {
-        console.error('ERROR: No se encontró el elemento buscarDocumento');
-        return;
-    }
-    
-    console.log('Elementos encontrados, cargando clientes...');
-    cargarClientes();
-    
-    // Buscar en tiempo real
-    buscarDocumento.addEventListener('input', (e) => {
-        const termino = e.target.value.trim();
-        if (termino.length >= 1) {
-            buscarClientesServidor(termino);
-        } else if (termino.length === 0) {
-            cargarClientes();
-        }
-    });
+    // Actualizar cada 5 segundos
+    setInterval(cargarDatos, 5000);
 });
 
-async function cargarClientes() {
+async function cargarDatos() {
     try {
-        const data = await fetchData('clientes?action=listar');
-        clientes = data || [];
-        
-        // Actualizar estadísticas si existen los elementos
-        const totalClientesEl = document.getElementById('totalClientes');
-        if (totalClientesEl) {
-            totalClientesEl.textContent = clientes.length;
-        }
-        
-        console.log('Clientes cargados:', clientes.length);
-        renderizarTabla();
-    } catch (error) {
-        console.error('Error al cargar clientes:', error);
-    }
-}
-
-async function buscarClientesServidor(termino) {
-    try {
-        console.log('Buscando clientes con termino:', termino);
-        
-        // Buscar usando la acción buscarDocumento (que busca por documento)
-        // Si no encuentra, buscar localmente en los clientes cargados
-        let clientesFiltrados = [];
-        
-        try {
-            // Intentar buscar por documento en el servidor
-            const dataPorDocumento = await fetchData(`clientes?action=buscarDocumento&documento=${encodeURIComponent(termino)}`);
-            clientesFiltrados = dataPorDocumento || [];
-        } catch (e) {
-            console.log('No encontrado por documento, buscando localmente...');
-        }
-        
-        // Si no encontró por documento, buscar localmente por nombre, correo o teléfono
-        if (clientesFiltrados.length === 0) {
-            clientesFiltrados = clientes.filter(cliente => {
-                const nombre = (cliente.nombre + ' ' + cliente.apellido).toLowerCase();
-                const correo = (cliente.correo || '').toLowerCase();
-                const telefono = (cliente.telefono || '').toLowerCase();
-                const documento = (cliente.documento || '').toLowerCase();
-                const terminoLower = termino.toLowerCase();
-                
-                return nombre.includes(terminoLower) || 
-                       documento.includes(terminoLower) ||
-                       correo.includes(terminoLower) || 
-                       telefono.includes(terminoLower);
-            });
-        }
-        
-        console.log('Resultados encontrados:', clientesFiltrados.length);
-        
-        // Mostrar resultados filtrados
-        const grid = document.getElementById('clientesGrid');
-        if (clientesFiltrados.length === 0) {
-            grid.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-500 text-lg">No se encontraron clientes con "${termino}"</p>
-                </div>
-            `;
+        // No recargar si el modal está abierto
+        const modalAbierto = !document.getElementById('modalCliente')?.classList.contains('hidden');
+        if (modalAbierto) {
+            console.log('Modal abierto, saltando recarga de datos');
             return;
         }
         
-        // Renderizar clientes filtrados usando la misma función que renderizarTabla
-        renderizarClientes(clientesFiltrados);
-    } catch (error) {
-        console.error('Error al buscar clientes:', error);
-        const grid = document.getElementById('clientesGrid');
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <i class="fas fa-exclamation-circle text-6xl text-red-300 mb-4"></i>
-                <p class="text-red-500 text-lg">Error al buscar clientes</p>
-            </div>
-        `;
-    }
-}
-
-// Función única para renderizar clientes (usada en búsqueda y vista normal)
-function renderizarClientes(clientesArray) {
-    const grid = document.getElementById('clientesGrid');
-    
-    if (!grid) {
-        console.error('ERROR: No se encontró el elemento clientesGrid');
-        return;
-    }
-    
-    if (clientesArray.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">No hay clientes registrados</p>
-            </div>
-        `;
-        return;
-    }
-    
-    grid.innerHTML = clientesArray.map(cliente => {
-        const inicial = cliente.nombre.charAt(0).toUpperCase();
-        const colores = ['from-blue-500 to-blue-600', 'from-purple-500 to-purple-600', 'from-pink-500 to-pink-600', 'from-green-500 to-green-600', 'from-orange-500 to-orange-600', 'from-red-500 to-red-600'];
-        const colorIndex = cliente.id % colores.length;
-        const colorGradient = colores[colorIndex];
-        const bgColor = ['bg-blue-100', 'bg-purple-100', 'bg-pink-100', 'bg-green-100', 'bg-orange-100', 'bg-red-100'][colorIndex];
+        console.log('Iniciando carga de datos de clientes...');
         
-        return `
-            <div class="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                <!-- Card Header con Gradient -->
-                <div class="bg-gradient-to-br ${colorGradient} p-6 text-white relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
-                    <div class="relative z-10 flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="${bgColor} w-16 h-16 rounded-full flex items-center justify-center font-bold text-2xl text-gray-800 shadow-lg">
-                                ${inicial}
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-xl">${cliente.nombre} ${cliente.apellido}</h3>
-                                <p class="text-white text-opacity-80 text-sm">Cliente #${cliente.id}</p>
-                            </div>
-                        </div>
-                        <div class="text-white text-opacity-60">
-                            <i class="fas fa-user-circle text-3xl"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Card Body -->
-                <div class="p-6 space-y-4">
-                    <!-- Documento -->
-                    <div class="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                        <div class="w-10 h-10 ${bgColor} rounded-lg flex items-center justify-center">
-                            <i class="fas fa-id-card text-gray-700"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-semibold">DOCUMENTO</p>
-                            <p class="text-sm font-semibold text-gray-800">${cliente.documento}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Email -->
-                    <div class="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                        <div class="w-10 h-10 ${bgColor} rounded-lg flex items-center justify-center">
-                            <i class="fas fa-envelope text-gray-700"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-xs text-gray-500 font-semibold">CORREO</p>
-                            <p class="text-sm font-semibold text-gray-800 truncate">${cliente.correo || 'No registrado'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Teléfono -->
-                    <div class="flex items-center space-x-3 pb-3 border-b border-gray-100">
-                        <div class="w-10 h-10 ${bgColor} rounded-lg flex items-center justify-center">
-                            <i class="fas fa-phone text-gray-700"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-semibold">TELÉFONO</p>
-                            <p class="text-sm font-semibold text-gray-800">${cliente.telefono || 'No registrado'}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Dirección -->
-                    <div class="flex items-start space-x-3">
-                        <div class="w-10 h-10 ${bgColor} rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-map-marker-alt text-gray-700"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-xs text-gray-500 font-semibold">DIRECCIÓN</p>
-                            <p class="text-sm font-semibold text-gray-800 truncate">${cliente.direccion || 'No registrada'}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Card Footer -->
-                <div class="bg-gray-50 px-6 py-4 flex justify-end gap-2 border-t">
-                    <button onclick="editarCliente(${cliente.id})" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition flex items-center gap-2 text-sm font-semibold shadow-sm hover:shadow-md">
-                        <i class="fas fa-edit"></i>
-                        <span>Editar</span>
-                    </button>
-                    <button onclick="eliminarCliente(${cliente.id})" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition flex items-center gap-2 text-sm font-semibold shadow-sm hover:shadow-md">
-                        <i class="fas fa-trash"></i>
-                        <span>Eliminar</span>
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
+        const [clientesData, reservasData] = await Promise.all([
+            fetchData('clientes?action=listar').catch(e => { console.error('Error clientes:', e); return []; }),
+            fetchData('reservas?action=listar').catch(e => { console.error('Error reservas:', e); return []; })
+        ]);
+        
+        clientes = clientesData || [];
+        reservas = reservasData || [];
+        
+        console.log('✓ Datos obtenidos del servidor:', { clientesCount: clientes.length, reservasCount: reservas.length });
+        
+        // Calcular estadísticas
+        const totalClientes = clientes.length;
+        
+        // Clientes activos (con reservas confirmadas)
+        const clientesActivos = new Set(
+            reservas.filter(r => r.estado === 'Confirmada').map(r => r.idCliente)
+        ).size;
+        
+        // Nuevos este mes
+        const hoy = new Date();
+        const hace30Dias = new Date(hoy.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const clientesNuevos = clientes.filter(c => {
+            if (!c.fechaRegistro) return false;
+            const fecha = new Date(c.fechaRegistro);
+            return fecha >= hace30Dias && fecha <= hoy;
+        }).length;
+        
+        // Ingresos totales (suma de todas las reservas confirmadas)
+        const ingresosTotales = reservas
+            .filter(r => r.estado === 'Confirmada')
+            .reduce((sum, r) => sum + (r.total || 0), 0);
+        
+        // Actualizar KPI
+        const totalEl = document.getElementById('totalClientes');
+        const activosEl = document.getElementById('clientesActivos');
+        const nuevosEl = document.getElementById('clientesNuevos');
+        const ingresosEl = document.getElementById('ingresosTotales');
+        
+        if (totalEl) totalEl.textContent = totalClientes;
+        if (activosEl) activosEl.textContent = clientesActivos;
+        if (nuevosEl) nuevosEl.textContent = clientesNuevos;
+        if (ingresosEl) ingresosEl.textContent = formatearMoneda(ingresosTotales);
+        
+        console.log('✓ KPI actualizados:', { totalClientes, clientesActivos, clientesNuevos, ingresosTotales });
+        
+        // Limpiar filtros y mostrar todos
+        console.log('Limpiando filtros y renderizando tabla...');
+        clientesFiltrados = [];
+        console.log('Array clientes antes de aplicarFiltros:', clientes);
+        aplicarFiltros();
+    } catch (error) {
+        console.error('Error al cargar datos:', error);
+        mostrarNotificacion('Error al cargar clientes', 'error');
+    }
 }
 
-function renderizarTabla() {
-    // Usar la función única para renderizar clientes
-    renderizarClientes(clientes);
+function aplicarFiltros() {
+    console.log('aplicarFiltros() llamado');
+    console.log('clientes disponibles:', clientes.length);
+    
+    const busqueda = document.getElementById('buscarCliente')?.value.toLowerCase() || '';
+    const tipo = document.getElementById('filtroTipo')?.value || '';
+    const estado = document.getElementById('filtroEstado')?.value || '';
+    
+    console.log('Filtros:', { busqueda, tipo, estado });
+    
+    clientesFiltrados = clientes.filter(c => {
+        // Filtro búsqueda
+        const coincideBusqueda = !busqueda || 
+            (c.nombre && c.nombre.toLowerCase().includes(busqueda)) ||
+            (c.apellido && c.apellido.toLowerCase().includes(busqueda)) ||
+            (c.documento && c.documento.includes(busqueda)) ||
+            (c.correo && c.correo.toLowerCase().includes(busqueda));
+        
+        // Filtro tipo
+        const coincideTipo = !tipo || c.tipo === tipo;
+        
+        // Filtro estado
+        let coincideEstado = true;
+        if (estado === 'Activo') {
+            const tieneReserva = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
+            coincideEstado = tieneReserva;
+        } else if (estado === 'Inactivo') {
+            const tieneReserva = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
+            coincideEstado = !tieneReserva;
+        }
+        
+        return coincideBusqueda && coincideTipo && coincideEstado;
+    });
+    
+    console.log('Clientes filtrados:', clientesFiltrados.length);
+    renderizarTabla();
 }
+
 
 function abrirModalNuevo() {
+    console.log('abrirModalNuevo() llamado');
+    const form = document.getElementById('formCliente');
+    const modal = document.getElementById('modalCliente');
+    
+    if (!form) {
+        console.error('ERROR: No se encontró formCliente');
+        return;
+    }
+    if (!modal) {
+        console.error('ERROR: No se encontró modalCliente');
+        return;
+    }
+    
     document.getElementById('modalTitulo').textContent = 'Nuevo Cliente';
-    document.getElementById('formCliente').reset();
+    form.reset();
     document.getElementById('clienteId').value = '';
-    document.getElementById('modalCliente').classList.remove('hidden');
+    modal.classList.remove('hidden');
+    console.log('Modal abierto');
 }
 
 async function editarCliente(id) {
@@ -257,6 +168,7 @@ function cerrarModal() {
 
 async function guardarCliente(event) {
     event.preventDefault();
+    console.log('guardarCliente() llamado');
     
     const id = document.getElementById('clienteId').value;
     const nombre = document.getElementById('nombre').value;
@@ -266,8 +178,11 @@ async function guardarCliente(event) {
     const telefono = document.getElementById('telefono').value;
     const direccion = document.getElementById('direccion').value;
     
+    console.log('Datos del formulario:', { id, nombre, apellido, documento, correo, telefono, direccion });
+    
     // Validar campos requeridos
     if (!nombre || !apellido || !documento) {
+        console.warn('Campos requeridos vacíos');
         mostrarNotificacion('Por favor completa los campos requeridos', 'error');
         return;
     }
@@ -283,7 +198,7 @@ async function guardarCliente(event) {
         direccion: direccion || ''
     });
     
-    console.log('Enviando datos:', {
+    console.log('Enviando datos al servidor:', {
         action: id ? 'actualizar' : 'insertar',
         nombre: nombre,
         apellido: apellido,
@@ -302,15 +217,18 @@ async function guardarCliente(event) {
         console.log('Response result:', result);
         
         if (result.success === true || result.success === 'true') {
-            mostrarNotificacion(id ? 'Cliente actualizado correctamente' : 'Cliente creado correctamente');
+            console.log('✓ Guardado exitoso');
+            mostrarNotificacion(id ? '✓ Cliente actualizado correctamente' : '✓ Cliente creado correctamente');
             cerrarModal();
-            cargarClientes();
+            console.log('Recargando datos después de guardar cliente...');
+            await cargarDatos();
+            console.log('✓ Datos recargados');
         } else {
             console.error('Error en respuesta:', result);
             mostrarNotificacion(result.error || 'Error al guardar cliente', 'error');
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al guardar:', error);
         mostrarNotificacion('Error al guardar cliente: ' + error.message, 'error');
     }
 }
@@ -332,7 +250,7 @@ async function eliminarCliente(id) {
             
             if (result.success) {
                 mostrarNotificacion('✓ Cliente eliminado correctamente');
-                cargarClientes();
+                await cargarDatos();
             } else {
                 mostrarNotificacion('Error al eliminar cliente: ' + (result.message || ''), 'error');
             }
@@ -343,7 +261,115 @@ async function eliminarCliente(id) {
     });
 }
 
+function renderizarTabla() {
+    const tbody = document.getElementById('tablaClientes');
+    
+    if (!tbody) {
+        console.error('ERROR: No se encontró el elemento tablaClientes');
+        return;
+    }
+    
+    console.log('renderizarTabla() llamado');
+    console.log('clientesFiltrados:', clientesFiltrados.length);
+    console.log('clientes:', clientes.length);
+    
+    const clientesAMostrar = clientesFiltrados.length > 0 ? clientesFiltrados : clientes;
+    
+    console.log('clientesAMostrar:', clientesAMostrar.length);
+    
+    if (clientesAMostrar.length === 0) {
+        console.warn('No hay clientes para mostrar');
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500"><span class="material-icons-outlined text-4xl">inbox</span><p class="mt-2">No hay clientes</p></td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = clientesAMostrar.map(c => {
+        // Contar reservas del cliente
+        const reservasCliente = reservas.filter(r => r.idCliente === c.id).length;
+        
+        // Calcular total gastado
+        const totalGastado = reservas
+            .filter(r => r.idCliente === c.id && r.estado === 'Confirmada')
+            .reduce((sum, r) => sum + (r.total || 0), 0);
+        
+        // Determinar si está activo
+        const esActivo = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
+        const estadoBadge = esActivo 
+            ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded font-semibold">Activo</span>'
+            : '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded font-semibold">Inactivo</span>';
+        
+        return `
+            <tr class="border-b hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-sm font-semibold text-gray-900">${c.nombre} ${c.apellido}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${c.documento}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${c.correo || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${c.telefono || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm text-center font-semibold text-blue-600">${reservasCliente}</td>
+                <td class="px-4 py-3 text-sm font-semibold text-green-600">${formatearMoneda(totalGastado)}</td>
+                <td class="px-4 py-3 text-center space-x-1">
+                    <button onclick="editarCliente(${c.id})" class="text-blue-600 hover:text-blue-800 p-1 rounded transition" title="Editar">
+                        <span class="material-icons-outlined text-lg">edit</span>
+                    </button>
+                    <button onclick="eliminarCliente(${c.id})" class="text-red-600 hover:text-red-800 p-1 rounded transition" title="Eliminar">
+                        <span class="material-icons-outlined text-lg">delete</span>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function exportarClientes() {
+    if (clientes.length === 0) {
+        mostrarNotificacion('No hay clientes para exportar', 'error');
+        return;
+    }
+    
+    // Preparar datos
+    const clientesAExportar = clientesFiltrados.length > 0 ? clientesFiltrados : clientes;
+    
+    // Crear CSV
+    const headers = ['Nombre', 'Documento', 'Email', 'Teléfono', 'Tipo', 'Reservas', 'Total Gastado'];
+    const rows = clientesAExportar.map(c => {
+        const reservasCliente = reservas.filter(r => r.idCliente === c.id).length;
+        const totalGastado = reservas
+            .filter(r => r.idCliente === c.id && r.estado === 'Confirmada')
+            .reduce((sum, r) => sum + (r.total || 0), 0);
+        
+        return [
+            c.nombre + ' ' + c.apellido,
+            c.documento,
+            c.correo || 'N/A',
+            c.telefono || 'N/A',
+            c.tipo || 'N/A',
+            reservasCliente,
+            totalGastado.toFixed(2)
+        ];
+    });
+    
+    // Crear contenido CSV
+    let csv = headers.join(',') + '\n';
+    rows.forEach(row => {
+        csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+    });
+    
+    // Descargar
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `clientes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    mostrarNotificacion('✓ Clientes exportados correctamente');
+}
+
 function limpiarBusqueda() {
     document.getElementById('buscarDocumento').value = '';
-    cargarClientes();
+    cargarDatos();
 }

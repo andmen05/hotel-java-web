@@ -12,156 +12,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas - Sistema Hotelero</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Reservas - Hotel Paradise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: "#4F46E5",
+                "background-light": "#F8FAFC",
+              },
+              fontFamily: {
+                display: ["Poppins", "sans-serif"],
+              },
+              borderRadius: {
+                DEFAULT: "0.75rem",
+              },
+            },
+          },
+        };
+    </script>
+    <style>
+        .material-icons-outlined {
+          font-size: inherit;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="font-display bg-background-light text-gray-700">
     <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-48 bg-gradient-to-b from-indigo-900 to-indigo-800 text-white shadow-2xl">
-            <div class="p-6 border-b border-indigo-700">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-white bg-opacity-20 p-2 rounded-lg">
-                        <i class="fas fa-hotel text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold">Hotel Paradise</h1>
-                        <p class="text-xs text-indigo-200">Sistema Moderno</p>
-                    </div>
+        <aside class="w-64 flex-shrink-0 bg-indigo-900 text-indigo-100 flex flex-col">
+            <div class="p-6 text-center">
+                <div class="bg-indigo-800 rounded-lg p-3 inline-flex items-center justify-center mb-2">
+                    <span class="material-icons-outlined text-4xl text-white">hotel</span>
                 </div>
+                <h1 class="text-xl font-bold text-white">Hotel Paradise</h1>
+                <p class="text-sm text-indigo-300">andmen05</p>
             </div>
-
-            <nav class="mt-8 space-y-2 px-4">
-                <a href="dashboard.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
+            <nav class="flex-1 px-4 space-y-2">
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="dashboard.jsp">
+                    <span class="material-icons-outlined mr-3">dashboard</span>
+                    Dashboard
                 </a>
-                <a href="clientes.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-users"></i>
-                    <span>Clientes</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="clientes.jsp">
+                    <span class="material-icons-outlined mr-3">people</span>
+                    Clientes
                 </a>
-                <a href="habitaciones.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-bed"></i>
-                    <span>Habitaciones</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="habitaciones.jsp">
+                    <span class="material-icons-outlined mr-3">king_bed</span>
+                    Habitaciones
                 </a>
-                <a href="reservas.jsp" class="flex items-center space-x-3 px-4 py-3 bg-indigo-700 rounded-lg hover:bg-indigo-600 transition">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reservas</span>
+                <a class="flex items-center px-4 py-2.5 bg-primary text-white rounded-lg font-semibold" href="reservas.jsp">
+                    <span class="material-icons-outlined mr-3">book_online</span>
+                    Reservas
                 </a>
-                <a href="checkin.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Check-in</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="checkin.jsp">
+                    <span class="material-icons-outlined mr-3">login</span>
+                    Check-in
                 </a>
-                <a href="productos.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-utensils"></i>
-                    <span>Productos</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="productos.jsp">
+                    <span class="material-icons-outlined mr-3">restaurant</span>
+                    Productos
                 </a>
-                <a href="ventas.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Ventas</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="ventas.jsp">
+                    <span class="material-icons-outlined mr-3">shopping_cart</span>
+                    Ventas
                 </a>
-                <a href="reportes.jsp" class="flex items-center space-x-3 px-4 py-3 hover:bg-indigo-700 rounded-lg transition">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reportes</span>
+                <a class="flex items-center px-4 py-2.5 text-indigo-300 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200" href="reportes.jsp">
+                    <span class="material-icons-outlined mr-3">assessment</span>
+                    Reportes
                 </a>
             </nav>
-
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700 w-48">
-                <a href="logout" class="flex items-center space-x-3 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition w-full justify-center">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Salir</span>
+            <div class="p-4 mt-auto">
+                <a href="logout" class="w-full flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200">
+                    <span class="material-icons-outlined mr-2">logout</span>
+                    Salir
                 </a>
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Bar -->
-            <div class="bg-white shadow-md px-8 py-4 flex justify-between items-center">
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="flex-shrink-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center sticky top-0 z-10">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Gestión de Reservas</h2>
-                    <p class="text-gray-600 text-sm">Administra todas tus reservas del hotel</p>
+                    <h2 class="text-2xl font-bold text-gray-900">Gestión de Reservas</h2>
+                    <p class="text-sm text-gray-500">Administra todas tus reservas del hotel</p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-bell text-gray-600 text-xl"></i>
+                    <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <span class="material-icons-outlined">notifications</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
-                        <i class="fas fa-cog text-gray-600 text-xl"></i>
+                    <button class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <span class="material-icons-outlined">settings</span>
                     </button>
-                    <!-- Avatar con Menú Desplegable -->
-                    <div class="relative">
-                        <button id="avatarBtn" class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold hover:shadow-lg transition cursor-pointer overflow-hidden">
-                            <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
-                        </button>
-                        <!-- Menú Desplegable -->
-                        <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl z-50 overflow-hidden">
-                            <!-- Header del Menú -->
-                            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-4">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-sm"><%= usuario.getNombre() != null ? usuario.getNombre() : "Usuario" %></p>
-                                        <p class="text-xs text-indigo-100">ID: <%= usuario.getId() %></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Opciones del Menú -->
-                            <div class="py-2">
-                                <a href="perfil.jsp" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 transition">
-                                    <i class="fas fa-user-circle text-indigo-600 w-5"></i>
-                                    <span>Mi Perfil</span>
-                                </a>
-                                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 transition">
-                                    <i class="fas fa-cog text-gray-600 w-5"></i>
-                                    <span>Configuración</span>
-                                </a>
-                                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 transition">
-                                    <i class="fas fa-question-circle text-gray-600 w-5"></i>
-                                    <span>Ayuda</span>
-                                </a>
-                                <hr class="my-2">
-                                <a href="logout" class="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 transition font-semibold">
-                                    <i class="fas fa-sign-out-alt w-5"></i>
-                                    <span>Cerrar Sesión</span>
-                                </a>
-                            </div>
-                        </div>
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
+                        <%= usuario.getNombre() != null && usuario.getNombre().length() > 0 ? usuario.getNombre().charAt(0) : "A" %>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <!-- Scrollable Content -->
             <div class="flex-1 overflow-auto">
                 <div class="p-8">
-                    <!-- Header with Button -->
+                    <!-- Header with Buttons -->
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Reservas Activas</h3>
-                            <p class="text-sm text-gray-600" id="reservasInfo">Cargando...</p>
+                            <h3 class="text-lg font-semibold text-gray-800">Gestión de Reservas</h3>
                         </div>
                         <div class="flex space-x-3">
-                            <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition flex items-center space-x-2">
-                                <i class="fas fa-download"></i>
+                            <button onclick="exportarReservas()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition flex items-center space-x-2 font-semibold text-sm">
+                                <span class="material-icons-outlined text-lg">download</span>
                                 <span>Exportar</span>
                             </button>
                             <button onclick="abrirModalNuevo()" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition flex items-center space-x-2 font-semibold">
-                                <i class="fas fa-plus"></i>
+                                <span class="material-icons-outlined">add</span>
                                 <span>Nueva Reserva</span>
                             </button>
                         </div>
                     </div>
 
+                    <!-- KPI Stats - Estilo Reportes -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                        <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Reservas</p>
+                                <p class="text-2xl font-bold text-gray-900 mt-1" id="totalReservas">0</p>
+                                <p class="text-xs text-gray-400">Todas</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                <span class="material-icons-outlined text-2xl">book_online</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                            <div>
+                                <p class="text-sm text-gray-500">Confirmadas</p>
+                                <p class="text-2xl font-bold text-gray-900 mt-1" id="reservasConfirmadas">0</p>
+                                <p class="text-xs text-gray-400">Activas</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <span class="material-icons-outlined text-2xl">check_circle</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                            <div>
+                                <p class="text-sm text-gray-500">Pendientes</p>
+                                <p class="text-2xl font-bold text-gray-900 mt-1" id="reservasPendientes">0</p>
+                                <p class="text-xs text-gray-400">Por confirmar</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                                <span class="material-icons-outlined text-2xl">schedule</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                            <div>
+                                <p class="text-sm text-gray-500">Ocupación Hoy</p>
+                                <p class="text-2xl font-bold text-gray-900 mt-1" id="ocupacionHoy">0%</p>
+                                <p class="text-xs text-gray-400">Habitaciones</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                <span class="material-icons-outlined text-2xl">hotel</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-lg shadow-sm flex items-center justify-between border border-gray-100">
+                            <div>
+                                <p class="text-sm text-gray-500">Ingresos Proyectados</p>
+                                <p class="text-2xl font-bold text-gray-900 mt-1" id="ingresosProyectados">$0</p>
+                                <p class="text-xs text-gray-400">Este mes</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <span class="material-icons-outlined text-2xl">trending_up</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Filters -->
-                    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-100">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Estado</label>
-                                <select id="filtroEstado" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 transition">
-                                    <option value="">Todos los estados</option>
+                                <label class="block text-xs font-semibold text-gray-700 mb-2">Buscar</label>
+                                <input type="text" id="buscarReserva" placeholder="Cliente, email..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-2">Estado</label>
+                                <select id="filtroEstado" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
+                                    <option value="">Todos</option>
                                     <option value="Confirmada">Confirmada</option>
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="Cancelada">Cancelada</option>
@@ -169,48 +206,38 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha Entrada</label>
-                                <input type="date" id="filtroFechaEntrada" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 transition">
+                                <label class="block text-xs font-semibold text-gray-700 mb-2">Fecha Salida</label>
+                                <input type="date" id="filtroFechaSalida" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha Salida</label>
-                                <input type="date" id="filtroFechaSalida" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Buscar</label>
-                                <input type="text" id="filtroBusqueda" placeholder="Cliente, habitación o ID..." class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 transition">
-                            </div>
-                            <div class="flex items-end space-x-2">
-                                <button type="button" onclick="aplicarFiltros()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-semibold cursor-pointer">
-                                    <i class="fas fa-search mr-2"></i>Filtrar
-                                </button>
-                                <button type="button" onclick="limpiarFiltros()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition font-semibold cursor-pointer" title="Limpiar filtros">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                                <label class="block text-xs font-semibold text-gray-700 mb-2">Habitación</label>
+                                <select id="filtroHabitacion" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
+                                    <option value="">Todas</option>
+                                </select>
                             </div>
                         </div>
                         <div class="mt-3 flex space-x-2 text-sm">
-                            <button type="button" onclick="filtrarPorPeriodo('hoy')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition cursor-pointer">Hoy</button>
-                            <button type="button" onclick="filtrarPorPeriodo('semana')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition cursor-pointer">Esta semana</button>
-                            <button type="button" onclick="filtrarPorPeriodo('mes')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition cursor-pointer">Este mes</button>
+                            <button type="button" onclick="filtrarPorPeriodo('hoy')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition cursor-pointer text-xs">Hoy</button>
+                            <button type="button" onclick="filtrarPorPeriodo('semana')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition cursor-pointer text-xs">Esta semana</button>
+                            <button type="button" onclick="filtrarPorPeriodo('mes')" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition cursor-pointer text-xs">Este mes</button>
                         </div>
                     </div>
 
                     <!-- Table -->
-                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
                         <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
                                     <tr>
-                                        <th class="px-6 py-4 text-left font-semibold">ID</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Cliente</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Habitación</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Check-in</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Check-out</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Noches</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Estado</th>
-                                        <th class="px-6 py-4 text-left font-semibold">Total</th>
-                                        <th class="px-6 py-4 text-center font-semibold">Acciones</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Cliente</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Habitación</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Check-in</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Check-out</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Noches</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Estado</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-gray-700">Total</th>
+                                        <th class="px-4 py-3 text-center font-semibold text-gray-700">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaReservas" class="divide-y divide-gray-200">
@@ -234,64 +261,57 @@
 
     <!-- Modal -->
     <div id="modalReserva" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-gray-100">
             <!-- Modal Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 sticky top-0">
+            <div class="bg-blue-600 text-white p-4 sticky top-0">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold" id="modalTitulo">Nueva Reserva</h3>
-                    <button onclick="cerrarModal()" class="text-white hover:bg-blue-700 p-2 rounded-lg transition">
-                        <i class="fas fa-times text-xl"></i>
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons-outlined">book_online</span>
+                        <h3 class="font-bold" id="modalTitulo">Nueva Reserva</h3>
+                    </div>
+                    <button onclick="cerrarModal()" class="text-white hover:bg-blue-700 p-1 rounded transition">
+                        <span class="material-icons-outlined">close</span>
                     </button>
                 </div>
             </div>
 
             <!-- Modal Body -->
-            <form id="formReserva" onsubmit="guardarReserva(event)" class="p-6 space-y-4">
+            <form id="formReserva" onsubmit="guardarReserva(event)" class="p-4 space-y-3">
                 <input type="hidden" id="reservaId">
                 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-user mr-2 text-blue-600"></i>Cliente
-                    </label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Cliente</label>
                     <select id="clienteReserva" required 
-                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600">
                         <option value="">Selecciona un cliente</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-door-open mr-2 text-blue-600"></i>Habitación
-                    </label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Habitación</label>
                     <select id="habitacionReserva" required 
-                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600">
                         <option value="">Selecciona una habitación</option>
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-calendar-check mr-2 text-blue-600"></i>Entrada
-                        </label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Entrada</label>
                         <input type="date" id="fechaEntrada" required 
-                               class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                               class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <i class="fas fa-calendar-times mr-2 text-blue-600"></i>Salida
-                        </label>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Salida</label>
                         <input type="date" id="fechaSalida" required 
-                               class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                               class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-tag mr-2 text-blue-600"></i>Tipo Reserva
-                    </label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Tipo Reserva</label>
                     <select id="tipoReserva" required 
-                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600">
                         <option value="">Selecciona un tipo</option>
                         <option value="Otro">Otro</option>
                         <option value="Airbnb">Airbnb</option>
@@ -301,11 +321,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        <i class="fas fa-info-circle mr-2 text-blue-600"></i>Estado
-                    </label>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Estado</label>
                     <select id="estadoReserva" required 
-                            class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-600">
                         <option value="">Selecciona un estado</option>
                         <option value="Pendiente">Pendiente</option>
                         <option value="Confirmada">Confirmada</option>

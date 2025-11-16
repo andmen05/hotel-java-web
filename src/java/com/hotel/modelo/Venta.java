@@ -1,5 +1,6 @@
 package com.hotel.modelo;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Venta {
     private long id;
@@ -12,6 +13,7 @@ public class Venta {
     private Integer idCliente;
     private Integer idHabitacion;
     private String tipoVenta;
+    private List<ProductoVendido> productos;
 
     public Venta() {
     }
@@ -108,6 +110,14 @@ public class Venta {
 
     public void setTipoVenta(String tipoVenta) {
         this.tipoVenta = tipoVenta;
+    }
+
+    public List<ProductoVendido> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(List<ProductoVendido> productos) {
+        this.productos = productos;
     }
 }
 

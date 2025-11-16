@@ -101,8 +101,11 @@ async function cargarKPIs() {
 
 async function generarReporte(tipo) {
     try {
+        console.log('Generando reporte de tipo:', tipo);
         const data = await fetchData(`reportes?tipo=${tipo}`);
         renderizarReporte(tipo, data);
+        // Scroll al contenedor de reportes
+        document.getElementById('contenidoReporte').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
         console.error('Error al generar reporte:', error);
         mostrarNotificacion('Error al generar reporte', 'error');

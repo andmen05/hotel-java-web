@@ -111,18 +111,67 @@ async function cargarDatos() {
 
 async function cargarCheckInsActivos() {
     try {
-        checkIns = await fetchData('checkin?action=activos') || [];
+        // Cargar check-ins activos Y todos los check-ins (para calcular check-outs)
+        let checkInsActivos = [];
+        let todosLosCheckIns = [];
         
-        // Calcular estadísticas
-        const totalCheckIns = checkIns.length;
-        
-        // Actualizar tarjetas de resumen si existen
-        const totalEl = document.getElementById('totalCheckIns');
-        if (totalEl) {
-            totalEl.textContent = totalCheckIns;
+        try {
+            checkInsActivos = await fetchData('checkin?action=activos') || [];
+            console.log('✓ Check-ins activos cargados:', checkInsActivos.length);
+        } catch (e) {
+            console.warn('⚠️ Check-ins activos no disponibles:', e.message);
+            checkInsActivos = [];
         }
         
-        console.log('✓ Check-ins activos:', totalCheckIns);
+        try {
+            todosLosCheckIns = await fetchData('checkin?action=listar') || [];
+            console.log('✓ Todos los check-ins cargados:', todosLosCheckIns.length);
+        } catch (e) {
+            console.warn('⚠️ No se pudieron cargar todos los check-ins:', e.message);
+            todosLosCheckIns = [];
+        }
+        
+        checkIns = checkInsActivos;
+        
+        // Calcular estadísticas
+        const totalCheckIns = checkInsActivos.length;
+        
+        // Actualizar tarjetas de resumen si existen
+        const totalActivos = document.getElementById('totalActivos');
+        if (totalActivos) {
+            totalActivos.textContent = totalCheckIns;
+        }
+        
+        // Calcular check-ins de hoy (RESERVAS confirmadas para hoy)
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        const checkinsHoy = reservas.filter(r => {
+            if (!r.fechaEntrada) return false;
+            const fechaEntrada = new Date(r.fechaEntrada);
+            fechaEntrada.setHours(0, 0, 0, 0);
+            return fechaEntrada.getTime() === hoy.getTime() && r.estado === 'Confirmada';
+        }).length;
+        
+        const checkinsHoyEl = document.getElementById('checkinsHoyCount');
+        if (checkinsHoyEl) {
+            checkinsHoyEl.textContent = checkinsHoy;
+        }
+        
+        // Calcular check-outs de hoy (TODOS los check-ins con fecha de salida hoy - incluyendo finalizados)
+        const checkoutsHoy = todosLosCheckIns.filter(ci => {
+            if (!ci.fechaSalidaChecking) return false;
+            const fechaSalida = new Date(ci.fechaSalidaChecking);
+            fechaSalida.setHours(0, 0, 0, 0);
+            return fechaSalida.getTime() === hoy.getTime();
+        }).length;
+        
+        const checkoutsHoyEl = document.getElementById('checkoutsHoyCount');
+        if (checkoutsHoyEl) {
+            checkoutsHoyEl.textContent = checkoutsHoy;
+        }
+        
+        console.log('✓ Check-ins activos:', totalCheckIns, '| Reservas para hoy:', checkinsHoy, '| Salidas hoy:', checkoutsHoy);
         
         renderizarTabla();
         renderizarAgenda();
@@ -147,14 +196,26 @@ function renderizarAgenda() {
             dias.push(fecha);
         }
         
-        // Contar reservas por día
+        // Obtener IDs de clientes que ya tienen check-in
+        const clientesConCheckIn = checkIns.map(ci => ci.idCliente);
+        console.log('📋 Clientes con check-in:', clientesConCheckIn);
+        console.log('📅 Total reservas:', reservas.length);
+        
+        // Contar reservas PENDIENTES de check-in por día (confirmadas pero sin check-in)
         const reservasPorDia = {};
         dias.forEach(dia => {
             const diaStr = dia.toISOString().split('T')[0];
-            reservasPorDia[diaStr] = reservas.filter(r => {
+            const reservasDelDia = reservas.filter(r => {
                 const fechaEntrada = new Date(r.fechaEntrada);
-                return fechaEntrada.toISOString().split('T')[0] === diaStr && r.estado === 'Confirmada';
-            }).length;
+                const esEseDia = fechaEntrada.toISOString().split('T')[0] === diaStr;
+                const esConfirmada = r.estado === 'Confirmada';
+                const sinCheckIn = !clientesConCheckIn.includes(r.idCliente);
+                return esEseDia && esConfirmada && sinCheckIn;
+            });
+            reservasPorDia[diaStr] = reservasDelDia.length;
+            if (reservasDelDia.length > 0) {
+                console.log(`📅 ${diaStr}: ${reservasDelDia.length} check-ins pendientes`);
+            }
         });
         
         // Renderizar días
@@ -182,7 +243,7 @@ function renderizarAgenda() {
                     <p class="text-lg font-bold text-gray-800">${dia.getDate()}</p>
                     <p class="text-xs text-gray-500 mb-2">${dia.toLocaleDateString('es-ES', { month: 'short' })}</p>
                     <div class="flex items-center justify-center space-x-1">
-                        <i class="fas fa-users text-sm ${colorTexto}"></i>
+                        <span class="material-icons-outlined text-sm ${colorTexto}">login</span>
                         <span class="text-sm font-bold ${colorTexto}">${cantidad}</span>
                     </div>
                     ${esHoy ? '<p class="text-xs font-bold text-purple-600 mt-1">HOY</p>' : ''}
@@ -190,14 +251,21 @@ function renderizarAgenda() {
             `;
         }).join('');
         
-        // Total de reservas próximas
-        const totalReservas = Object.values(reservasPorDia).reduce((a, b) => a + b, 0);
-        const totalEl = document.getElementById('totalReservasProximas');
-        if (totalEl) {
-            totalEl.textContent = totalReservas;
+        // Total de reservas PENDIENTES de check-in próximas
+        const totalReservasPendientes = Object.values(reservasPorDia).reduce((a, b) => a + b, 0);
+        
+        // Actualizar ambos elementos (header y KPI card)
+        const totalElHeader = document.getElementById('totalReservasProximasHeader');
+        if (totalElHeader) {
+            totalElHeader.textContent = totalReservasPendientes;
         }
         
-        console.log('✓ Agenda renderizada:', totalReservas, 'reservas próximas');
+        const totalElCard = document.getElementById('totalReservasProximas');
+        if (totalElCard) {
+            totalElCard.textContent = totalReservasPendientes;
+        }
+        
+        console.log('✓ Agenda renderizada:', totalReservasPendientes, 'check-ins pendientes próximos 7 días');
     } catch (error) {
         console.error('Error al renderizar agenda:', error);
     }
@@ -362,6 +430,7 @@ async function guardarCheckIn(event) {
             mostrarNotificacion('✅ Check-in registrado correctamente - Habitación OCUPADA');
             document.getElementById('formCheckIn').reset();
             await cargarDatos();
+            await cargarCheckInsActivos();
         } else {
             mostrarNotificacion('❌ Error: ' + (result.message || 'No se pudo registrar el check-in'), 'error');
         }
@@ -402,6 +471,7 @@ async function hacerCheckOut(event) {
             mostrarNotificacion('✅ Check-out realizado correctamente - Habitación DISPONIBLE');
             cerrarModalCheckOut();
             await cargarDatos();
+            await cargarCheckInsActivos();
         } else {
             mostrarNotificacion('❌ Error al realizar check-out', 'error');
         }

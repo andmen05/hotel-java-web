@@ -92,7 +92,10 @@ public class VentaDAO {
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                ventas.add(mapearVenta(rs));
+                Venta venta = mapearVenta(rs);
+                // Cargar productos asociados
+                venta.setProductos(obtenerProductosVendidos(venta.getId()));
+                ventas.add(venta);
             }
         } catch (SQLException e) {
             System.err.println("Error al listar ventas: " + e.getMessage());

@@ -1,44 +1,63 @@
 // Gestión de Habitaciones
 
 let habitaciones = [];
-let clientes = [];
+let habitacionesFiltradas = [];
 let checkinsActivos = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🏨 Habitaciones - Inicializando...');
+    cargarDatos();
     
-    // Verificar que los elementos existan
-    const habitacionesGrid = document.getElementById('habitacionesGrid');
+    // Event listeners para filtros
+    document.getElementById('buscarHabitacion')?.addEventListener('input', aplicarFiltros);
+    document.getElementById('filtroTipo')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtroRango')?.addEventListener('input', (e) => {
+        document.getElementById('rangoValor').textContent = e.target.value;
+        aplicarFiltros();
+    });
     
-    if (!habitacionesGrid) {
-        console.error('ERROR: No se encontró el elemento habitacionesGrid');
-        return;
-    }
-    
-    console.log('✓ Elementos encontrados, cargando habitaciones...');
-    cargarHabitaciones();
-    
-    // Actualizar grid cards cada 5 segundos
-    setInterval(cargarHabitaciones, 5000);
+    // Actualizar cada 5 segundos
+    setInterval(cargarDatos, 5000);
 });
 
-async function cargarHabitaciones() {
+async function cargarDatos() {
     try {
-        // IMPORTANTE: Cargar habitaciones, check-ins activos Y clientes
-        const [habitacionesData, checkinsData, clientesData] = await Promise.all([
+        // No recargar si el modal está abierto
+        const modalAbierto = !document.getElementById('modalHabitacion')?.classList.contains('hidden');
+        if (modalAbierto) {
+            console.log('Modal abierto, saltando recarga de datos');
+            return;
+        }
+        
+        console.log('Iniciando carga de datos de habitaciones...');
+        
+        const [habitacionesData, clientesData] = await Promise.all([
             fetchData('habitaciones?action=listar').catch(e => { console.error('Error habitaciones:', e); return []; }),
-            fetchData('checkin?action=activos').catch(e => { console.error('Error check-ins activos:', e); return []; }),
             fetchData('clientes?action=listar').catch(e => { console.error('Error clientes:', e); return []; })
         ]);
         
         habitaciones = habitacionesData || [];
-        checkinsActivos = checkinsData || [];
-        clientes = clientesData || [];
+        
+        // Intentar cargar check-ins, pero si falla, usar array vacío (sin mostrar error)
+        try {
+            const response = await fetch('checkins?action=listar');
+            if (response.ok) {
+                checkinsActivos = await response.json() || [];
+            } else {
+                checkinsActivos = [];
+            }
+        } catch (e) {
+            checkinsActivos = [];
+        }
+        
+        console.log('✓ Datos obtenidos:', { habitacionesCount: habitaciones.length, checkinsCount: checkinsActivos.length });
         
         // Obtener IDs de habitaciones con check-in activo
         const habitacionesOcupadasPorCheckin = checkinsActivos.map(c => c.habitacion);
         
-        // Calcular estadísticas CORRECTAMENTE
+        // Calcular estadísticas
+        const total = habitaciones.length;
         const disponibles = habitaciones.filter(h => 
             h.estado === 'Disponible' && !habitacionesOcupadasPorCheckin.includes(h.id)
         ).length;
@@ -49,6 +68,12 @@ async function cargarHabitaciones() {
         
         const mantenimiento = habitaciones.filter(h => h.estado === 'Mantenimiento').length;
         
+        // Ingresos proyectados (ocupadas * precio promedio)
+        const precioPromedio = habitaciones.length > 0 
+            ? habitaciones.reduce((sum, h) => sum + (h.precioNoche || 0), 0) / habitaciones.length 
+            : 0;
+        const ingresosProyectados = ocupadas * precioPromedio * 30;
+        
         // Actualizar tarjetas de resumen
         const disponiblesEl = document.getElementById('disponibles');
         const ocupadasEl = document.getElementById('ocupadas');
@@ -58,83 +83,103 @@ async function cargarHabitaciones() {
         if (ocupadasEl) ocupadasEl.textContent = ocupadas;
         if (mantenimientoEl) mantenimientoEl.textContent = mantenimiento;
         
-        console.log('✓ Habitaciones - Disponibles: ' + disponibles + ', Ocupadas: ' + ocupadas + ', Mantenimiento: ' + mantenimiento);
-        console.log('✓ Check-ins activos: ' + checkinsActivos.length);
-        console.log('✓ Clientes cargados: ' + clientes.length);
+        // Actualizar KPI
+        const totalEl = document.getElementById('totalHabitaciones');
+        const ingresosEl = document.getElementById('ingresosProyectados');
         
-        renderizarTabla();
+        if (totalEl) totalEl.textContent = total;
+        if (ingresosEl) ingresosEl.textContent = formatearMoneda(ingresosProyectados);
+        
+        console.log('✓ KPI actualizados:', { total, disponibles, ocupadas, mantenimiento, ingresosProyectados });
+        
+        // Limpiar filtros y renderizar
+        habitacionesFiltradas = [];
+        aplicarFiltros();
     } catch (error) {
-        console.error('Error al cargar habitaciones:', error);
+        console.error('Error al cargar datos:', error);
     }
 }
 
-function renderizarTabla() {
-    const grid = document.getElementById('habitacionesGrid');
+function aplicarFiltros() {
+    const busqueda = document.getElementById('buscarHabitacion')?.value.toLowerCase() || '';
+    const tipo = document.getElementById('filtroTipo')?.value || '';
+    const estado = document.getElementById('filtroEstado')?.value || '';
+    const rango = parseInt(document.getElementById('filtroRango')?.value || '500');
     
-    if (!grid) {
-        console.error('ERROR: No se encontró el elemento habitacionesGrid en renderizarTabla');
-        return;
-    }
-    
-    if (habitaciones.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">No hay habitaciones registradas</p>
-            </div>
-        `;
-        return;
-    }
-    
-    grid.innerHTML = habitaciones.map(h => {
-        // Obtener check-in activo para esta habitación
-        const checkinActivo = checkinsActivos.find(c => c.habitacion === h.id);
+    habitacionesFiltradas = habitaciones.filter(h => {
+        // Filtro búsqueda
+        const coincideBusqueda = !busqueda || 
+            h.idHabitacion.toString().includes(busqueda) ||
+            h.tipoHabitacion.toLowerCase().includes(busqueda);
         
-        // Obtener cliente si está ocupada
-        let huespedInfo = 'Disponible';
-        if (checkinActivo) {
-            const cliente = clientes.find(c => c.id === checkinActivo.idCliente);
-            huespedInfo = cliente ? `👤 ${cliente.nombre} ${cliente.apellido}` : `👤 Huésped ${checkinActivo.idCliente}`;
+        // Filtro tipo
+        const coincideTipo = !tipo || h.tipoHabitacion === tipo;
+        
+        // Filtro estado
+        let coincideEstado = true;
+        if (estado) {
+            const tieneCheckinActivo = checkinsActivos.some(c => c.habitacion === h.id);
+            const estadoReal = tieneCheckinActivo ? 'Ocupada' : h.estado;
+            coincideEstado = estadoReal === estado;
         }
         
+        // Filtro rango precio
+        const coincideRango = h.precioNoche <= rango;
+        
+        return coincideBusqueda && coincideTipo && coincideEstado && coincideRango;
+    });
+    
+    renderizarTabla();
+}
+
+function renderizarTabla() {
+    const tbody = document.getElementById('tablaHabitaciones');
+    
+    if (!tbody) {
+        console.error('ERROR: No se encontró tablaHabitaciones');
+        return;
+    }
+    
+    const habitacionesAMostrar = habitacionesFiltradas.length > 0 ? habitacionesFiltradas : habitaciones;
+    
+    if (habitacionesAMostrar.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500"><span class="material-icons-outlined text-4xl">inbox</span><p class="mt-2">No hay habitaciones</p></td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = habitacionesAMostrar.map(h => {
         // Determinar estado basado en check-in activo
         const tieneCheckinActivo = checkinsActivos.some(c => c.habitacion === h.id);
-        const estado = tieneCheckinActivo ? 'Ocupada' : h.estado;
+        const estadoReal = tieneCheckinActivo ? 'Ocupada' : h.estado;
         
-        // Determinar color según estado
-        const borderColor = estado === 'Disponible' ? 'border-4 border-green-500' :
-                           estado === 'Ocupada' ? 'border-4 border-red-500' :
-                           'border-4 border-orange-500';
-        
-        const bgColor = estado === 'Disponible' ? 'bg-green-50' :
-                       estado === 'Ocupada' ? 'bg-red-50' :
-                       'bg-orange-50';
-        
-        const textColor = estado === 'Disponible' ? 'text-green-700' :
-                         estado === 'Ocupada' ? 'text-red-700' :
-                         'text-orange-700';
+        // Badge de estado
+        let estadoBadge = 'bg-green-100 text-green-800';
+        if (estadoReal === 'Ocupada') {
+            estadoBadge = 'bg-red-100 text-red-800';
+        } else if (estadoReal === 'Mantenimiento') {
+            estadoBadge = 'bg-orange-100 text-orange-800';
+        } else if (estadoReal === 'Limpieza') {
+            estadoBadge = 'bg-yellow-100 text-yellow-800';
+        }
         
         return `
-            <div class="rounded-lg p-6 text-center transition hover:shadow-lg ${borderColor} ${bgColor}">
-                <h3 class="text-3xl font-bold ${textColor} mb-2">Hab. ${h.idHabitacion}</h3>
-                <p class="text-sm text-gray-600 mb-3">${h.tipoHabitacion}</p>
-                
-                <div class="mb-4 p-3 bg-white rounded-lg border ${estado === 'Disponible' ? 'border-green-200' : 'border-red-200'}">
-                    <p class="text-xs text-gray-500 mb-1">Huésped:</p>
-                    <p class="text-lg font-bold ${textColor}">${huespedInfo}</p>
-                </div>
-                
-                <p class="text-xs text-gray-600 mb-2">${formatearMoneda(h.precioNoche)}/noche • ${h.capacidad} pax</p>
-                
-                <div class="flex space-x-2">
-                    <button onclick="editarHabitacion(${h.id})" class="flex-1 px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition">
-                        <i class="fas fa-edit"></i>
+            <tr class="border-b hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-sm font-semibold text-gray-900">${h.idHabitacion}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${h.tipoHabitacion}</td>
+                <td class="px-4 py-3 text-sm">
+                    <span class="px-2 py-1 rounded text-xs font-semibold ${estadoBadge}">${estadoReal}</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-center text-gray-700">${h.capacidad} pax</td>
+                <td class="px-4 py-3 text-sm font-semibold text-green-600">${formatearMoneda(h.precioNoche)}</td>
+                <td class="px-4 py-3 text-center space-x-1">
+                    <button onclick="editarHabitacion(${h.id})" class="text-blue-600 hover:text-blue-800 p-1 rounded transition" title="Editar">
+                        <span class="material-icons-outlined text-lg">edit</span>
                     </button>
-                    <button onclick="eliminarHabitacion(${h.id})" class="flex-1 px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs transition">
-                        <i class="fas fa-trash"></i>
+                    <button onclick="eliminarHabitacion(${h.id})" class="text-red-600 hover:text-red-800 p-1 rounded transition" title="Eliminar">
+                        <span class="material-icons-outlined text-lg">delete</span>
                     </button>
-                </div>
-            </div>
+                </td>
+            </tr>
         `;
     }).join('');
 }
@@ -190,9 +235,9 @@ async function guardarHabitacion(event) {
         const result = await response.json();
         
         if (result.success) {
-            mostrarNotificacion(id ? 'Habitación actualizada correctamente' : 'Habitación creada correctamente');
+            mostrarNotificacion(id ? '✓ Habitación actualizada' : '✓ Habitación creada');
             cerrarModal();
-            cargarHabitaciones();
+            await cargarDatos();
         } else {
             mostrarNotificacion('Error al guardar habitación', 'error');
         }
@@ -209,8 +254,8 @@ async function eliminarHabitacion(id) {
             const result = await response.json();
             
             if (result.success) {
-                mostrarNotificacion('Habitación eliminada correctamente');
-                cargarHabitaciones();
+                mostrarNotificacion('✓ Habitación eliminada');
+                await cargarDatos();
             } else {
                 mostrarNotificacion('Error al eliminar habitación', 'error');
             }
@@ -221,3 +266,48 @@ async function eliminarHabitacion(id) {
     });
 }
 
+function exportarHabitaciones() {
+    if (habitaciones.length === 0) {
+        mostrarNotificacion('No hay habitaciones para exportar', 'error');
+        return;
+    }
+    
+    // Preparar datos
+    const habitacionesAExportar = habitacionesFiltradas.length > 0 ? habitacionesFiltradas : habitaciones;
+    
+    // Crear CSV
+    const headers = ['ID', 'Tipo', 'Estado', 'Capacidad', 'Precio/Noche'];
+    const rows = habitacionesAExportar.map(h => {
+        const tieneCheckinActivo = checkinsActivos.some(c => c.habitacion === h.id);
+        const estadoReal = tieneCheckinActivo ? 'Ocupada' : h.estado;
+        
+        return [
+            h.idHabitacion,
+            h.tipoHabitacion,
+            estadoReal,
+            h.capacidad,
+            h.precioNoche.toFixed(2)
+        ];
+    });
+    
+    // Crear contenido CSV
+    let csv = headers.join(',') + '\n';
+    rows.forEach(row => {
+        csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+    });
+    
+    // Descargar
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `habitaciones_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    mostrarNotificacion('✓ Habitaciones exportadas correctamente');
+}

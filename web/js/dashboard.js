@@ -2,27 +2,71 @@
 
 async function cargarDatosCheckinsHoy() {
     try {
-        const checkIns = await fetchData('checkin?action=activos');
-        const checkInsArray = checkIns || [];
+        // Cargar reservas, check-ins y habitaciones
+        let reservas = [];
+        let checkIns = [];
+        let habitaciones = [];
         
-        console.log('Check-ins cargados:', checkInsArray.length);
+        try {
+            reservas = await fetchData('reservas?action=listar') || [];
+        } catch (e) {
+            console.warn('⚠️ No se pudieron cargar reservas:', e.message);
+            reservas = [];
+        }
         
-        // Actualizar número de check-ins hoy
-        document.getElementById('checkinsHoy').textContent = checkInsArray.length;
+        try {
+            checkIns = await fetchData('checkin?action=activos') || [];
+        } catch (e) {
+            console.warn('⚠️ No se pudieron cargar check-ins activos:', e.message);
+            checkIns = [];
+        }
         
-        if (checkInsArray.length > 0) {
-            const proximoCheckin = checkInsArray[0];
-            const fecha = new Date(proximoCheckin.fechaIngresoCheckin).toLocaleString('es-ES');
-            document.getElementById('proximoCheckin').textContent = `📅 ${fecha}`;
-        } else {
-            document.getElementById('proximoCheckin').textContent = '⏰ Sin check-ins';
+        try {
+            habitaciones = await fetchData('habitaciones?action=listar') || [];
+        } catch (e) {
+            console.warn('⚠️ No se pudieron cargar habitaciones:', e.message);
+            habitaciones = [];
+        }
+        
+        // Filtrar reservas confirmadas que aún no tienen check-in
+        // Un check-in está asociado a una habitación, no a una reserva
+        const habitacionesConCheckIn = checkIns.map(ci => ci.habitacion);
+        const checkInsPendientes = reservas.filter(r => 
+            r.estado === 'Confirmada' && !habitacionesConCheckIn.includes(r.habitacion)
+        );
+        
+        console.log('Check-ins pendientes:', checkInsPendientes.length);
+        
+        // Actualizar número de check-ins pendientes
+        const checkinsHoyEl = document.getElementById('checkinsHoy');
+        const textCheckinsHoyEl = document.getElementById('textCheckinsHoy');
+        if (checkinsHoyEl) {
+            checkinsHoyEl.textContent = checkInsPendientes.length;
+        }
+        if (textCheckinsHoyEl) {
+            if (checkInsPendientes.length === 0) {
+                textCheckinsHoyEl.textContent = 'Sin check-ins';
+            } else if (checkInsPendientes.length === 1) {
+                textCheckinsHoyEl.textContent = '1 check-in pendiente';
+            } else {
+                textCheckinsHoyEl.textContent = checkInsPendientes.length + ' check-ins pendientes';
+            }
         }
         
         // Actualizar lista de check-ins pendientes
-        document.getElementById('countCheckinsP').textContent = checkInsArray.length + ' pendientes';
+        const countCheckinsEl = document.getElementById('countCheckinsP');
+        if (countCheckinsEl) {
+            countCheckinsEl.textContent = checkInsPendientes.length + ' pendientes';
+        }
         
-        if (checkInsArray.length === 0) {
-            document.getElementById('listaCheckinsP').innerHTML = `
+        const listaCheckinsEl = document.getElementById('listaCheckinsP');
+        if (!listaCheckinsEl) {
+            console.warn('⚠️ Elemento listaCheckinsP no encontrado');
+            return;
+        }
+        
+        if (checkInsPendientes.length === 0) {
+            listaCheckinsEl.innerHTML = `
                 <p class="text-gray-500 text-center py-8">
                     <i class="fas fa-inbox text-2xl text-gray-300 mb-2"></i><br>
                     No hay check-ins pendientes
@@ -32,36 +76,49 @@ async function cargarDatosCheckinsHoy() {
         }
         
         let html = '';
-        checkInsArray.slice(0, 5).forEach(checkin => {
-            const fecha = new Date(checkin.fechaIngresoCheckin).toLocaleString('es-ES', {
+        checkInsPendientes.slice(0, 5).forEach(reserva => {
+            const fecha = new Date(reserva.fechaEntrada).toLocaleString('es-ES', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
+            
+            // Buscar el nombre de la habitación
+            const habitacion = habitaciones.find(h => h.id === reserva.habitacion);
+            const nombreHabitacion = habitacion ? habitacion.idHabitacion : `Hab. ${reserva.habitacion}`;
+            
             html += `
                 <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition">
                     <div class="bg-green-500 p-2 rounded-lg flex-shrink-0">
                         <i class="fas fa-sign-in-alt text-white"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-sm text-gray-800">Check-in Hab. ${checkin.habitacion || 'N/A'}</p>
-                        <p class="text-xs text-gray-600">Noches: ${checkin.noches || 1}</p>
+                        <p class="font-semibold text-sm text-gray-800">Check-in Hab. ${nombreHabitacion}</p>
+                        <p class="text-xs text-gray-600">Reserva #${reserva.id}</p>
                         <p class="text-xs text-green-600 mt-1">🕐 ${fecha}</p>
                     </div>
                 </div>
             `;
         });
         
-        document.getElementById('listaCheckinsP').innerHTML = html;
+        listaCheckinsEl.innerHTML = html;
     } catch (error) {
-        console.error('Error al cargar check-ins:', error);
-        document.getElementById('checkinsHoy').textContent = '0';
-        document.getElementById('countCheckinsP').textContent = '0 pendientes';
-        document.getElementById('listaCheckinsP').innerHTML = `
-            <p class="text-gray-500 text-center py-8">
-                <i class="fas fa-exclamation-circle text-2xl text-red-300 mb-2"></i><br>
-                Error al cargar check-ins
-            </p>
-        `;
+        console.warn('⚠️ Error al cargar check-ins:', error);
+        
+        const checkinsHoyEl = document.getElementById('checkinsHoy');
+        if (checkinsHoyEl) checkinsHoyEl.textContent = '0';
+        
+        const countCheckinsEl = document.getElementById('countCheckinsP');
+        if (countCheckinsEl) countCheckinsEl.textContent = '0 pendientes';
+        
+        const listaCheckinsEl = document.getElementById('listaCheckinsP');
+        if (listaCheckinsEl) {
+            listaCheckinsEl.innerHTML = `
+                <p class="text-gray-500 text-center py-8">
+                    <i class="fas fa-inbox text-2xl text-gray-300 mb-2"></i><br>
+                    No hay check-ins pendientes
+                </p>
+            `;
+        }
     }
 }
 
@@ -298,17 +355,34 @@ async function actualizarReservasConfirmadas() {
         
         // Filtrar reservas confirmadas
         const reservasConfirmadas = reservasArray.filter(r => r.estado === 'Confirmada').length;
-        const proximaReserva = reservasArray.filter(r => r.estado === 'Confirmada').length;
         
         // Actualizar grid card
-        document.getElementById('reservasConfirmadas').textContent = reservasConfirmadas;
-        document.getElementById('variacionReservas').textContent = `📅 ${proximaReserva} activas`;
+        const reservasEl = document.getElementById('reservasConfirmadas');
+        const textReservasEl = document.getElementById('textReservasConfirmadas');
+        if (reservasEl) {
+            reservasEl.textContent = reservasConfirmadas;
+        }
+        if (textReservasEl) {
+            if (reservasConfirmadas === 0) {
+                textReservasEl.textContent = 'Sin reservas';
+            } else if (reservasConfirmadas === 1) {
+                textReservasEl.textContent = '1 activa';
+            } else {
+                textReservasEl.textContent = reservasConfirmadas + ' activas';
+            }
+        }
         
         console.log('✓ Reservas confirmadas:', reservasConfirmadas);
     } catch (error) {
-        console.error('Error al actualizar reservas:', error);
-        document.getElementById('reservasConfirmadas').textContent = '0';
-        document.getElementById('variacionReservas').textContent = '📅 Error';
+        console.warn('⚠️ Error al actualizar reservas:', error);
+        const reservasEl = document.getElementById('reservasConfirmadas');
+        const textReservasEl = document.getElementById('textReservasConfirmadas');
+        if (reservasEl) {
+            reservasEl.textContent = '0';
+        }
+        if (textReservasEl) {
+            textReservasEl.textContent = 'Sin reservas';
+        }
     }
 }
 

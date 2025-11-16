@@ -8,25 +8,47 @@ let carrito = [];
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Ventas - Inicializando...');
     cargarDatos();
+    
+    // Event listener para el botón "Agregar al Carrito"
+    const btnAgregar = document.getElementById('btnAgregarCarrito');
+    if (btnAgregar) {
+        console.log('✓ Botón Agregar al Carrito encontrado');
+        btnAgregar.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('🛒 Botón Agregar al Carrito clickeado');
+            agregarProducto();
+        });
+    } else {
+        console.error('❌ Botón Agregar al Carrito NO encontrado');
+    }
+    
     // Actualizar grid cards cada 5 segundos
     setInterval(actualizarGridCards, 5000);
 });
 
 async function cargarDatos() {
     try {
-        console.log('Cargando datos de ventas...');
+        console.log('🛒 Ventas - Cargando datos...');
         
-        [productos, habitaciones, ventas] = await Promise.all([
-            fetchData('productos?action=disponibles').catch(e => { console.error('Error productos:', e); return []; }),
-            fetchData('habitaciones?action=listar').catch(e => { console.error('Error habitaciones:', e); return []; }),
-            fetchData('ventas?action=listar').catch(e => { console.error('Error ventas:', e); return []; })
-        ]);
+        const productosData = await fetchData('productos?action=listar').catch(e => { 
+            console.error('Error productos:', e); 
+            return []; 
+        });
+        const habitacionesData = await fetchData('habitaciones?action=listar').catch(e => { 
+            console.error('Error habitaciones:', e); 
+            return []; 
+        });
+        const ventasData = await fetchData('ventas?action=listar').catch(e => { 
+            console.error('Error ventas:', e); 
+            return []; 
+        });
         
-        productos = productos || [];
-        habitaciones = habitaciones || [];
-        ventas = ventas || [];
+        productos = productosData || [];
+        habitaciones = habitacionesData || [];
+        ventas = ventasData || [];
         
         console.log('✓ Datos cargados:', { productos: productos.length, habitaciones: habitaciones.length, ventas: ventas.length });
+        console.log('Productos:', productos);
         
         // Actualizar grid cards
         actualizarGridCards();
@@ -35,12 +57,27 @@ async function cargarDatos() {
         
         // Llenar selects
         const selectProducto = document.getElementById('productoVenta');
-        selectProducto.innerHTML = '<option value="">Seleccione un producto</option>' +
-            productos.map(p => `<option value="${p.id}" data-precio="${p.precioVenta}" data-iva="${p.iva}">${p.descripcion} - ${formatearMoneda(p.precioVenta)}</option>`).join('');
+        console.log('Llenando select de productos con:', productos.length, 'productos');
+        if (selectProducto) {
+            selectProducto.innerHTML = '<option value="">Seleccione un producto</option>' +
+                productos.map(p => `<option value="${p.id}" data-precio="${p.precioVenta}" data-iva="${p.iva}">${p.descripcion} - ${formatearMoneda(p.precioVenta)}</option>`).join('');
+            
+            // Event listener para auto-llenar precio
+            selectProducto.addEventListener('change', (e) => {
+                const option = e.target.options[e.target.selectedIndex];
+                if (option.value) {
+                    const precio = option.dataset.precio;
+                    console.log('Producto seleccionado, precio:', precio);
+                    document.getElementById('precioUnitario').value = precio;
+                }
+            });
+        }
         
         const selectHabitacion = document.getElementById('habitacionVenta');
-        selectHabitacion.innerHTML = '<option value="">Seleccione una habitación</option>' +
-            habitaciones.map(h => `<option value="${h.id}">${h.idHabitacion} - ${h.tipoHabitacion}</option>`).join('');
+        if (selectHabitacion) {
+            selectHabitacion.innerHTML = '<option value="">Seleccione una habitación</option>' +
+                habitaciones.map(h => `<option value="${h.id}">${h.idHabitacion} - ${h.tipoHabitacion}</option>`).join('');
+        }
         
         const filtroHabitacion = document.getElementById('filtroHabitacion');
         if (filtroHabitacion) {
@@ -48,13 +85,7 @@ async function cargarDatos() {
                 habitaciones.map(h => `<option value="${h.id}">${h.idHabitacion}</option>`).join('');
         }
         
-        selectProducto.addEventListener('change', (e) => {
-            const option = e.target.options[e.target.selectedIndex];
-            if (option.value) {
-                document.getElementById('precioUnitario').value = option.dataset.precio;
-            }
-        });
-        
+        console.log('✓ Selects llenados correctamente');
         renderizarHistorial();
     } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -107,16 +138,35 @@ function actualizarGridCards() {
 
 function agregarProducto() {
     const productoId = document.getElementById('productoVenta').value;
-    const cantidad = parseInt(document.getElementById('cantidad').value);
-    const precioUnitario = parseFloat(document.getElementById('precioUnitario').value);
+    const cantidad = parseInt(document.getElementById('cantidad').value) || 0;
+    const precioUnitario = parseFloat(document.getElementById('precioUnitario').value) || 0;
     
-    if (!productoId || cantidad <= 0) {
-        mostrarNotificacion('Seleccione un producto y cantidad válida', 'error');
+    console.log('agregarProducto() - productoId:', productoId, 'cantidad:', cantidad, 'precio:', precioUnitario);
+    
+    // Validar que haya un producto seleccionado
+    if (!productoId) {
+        mostrarNotificacion('⚠️ Selecciona un Producto', 'error');
+        return;
+    }
+    
+    // Validar cantidad
+    if (cantidad <= 0) {
+        mostrarNotificacion('⚠️ Ingresa una Cantidad válida', 'error');
+        return;
+    }
+    
+    // Validar precio
+    if (!precioUnitario || precioUnitario <= 0) {
+        mostrarNotificacion('⚠️ El precio no se ha cargado. Selecciona el producto nuevamente', 'error');
         return;
     }
     
     const producto = productos.find(p => p.id == productoId);
-    if (!producto) return;
+    console.log('Producto encontrado:', producto);
+    if (!producto) {
+        mostrarNotificacion('❌ Producto no encontrado', 'error');
+        return;
+    }
     
     const item = {
         idProducto: producto.id,
@@ -138,20 +188,37 @@ function agregarProducto() {
 
 function actualizarCarrito() {
     const carritoDiv = document.getElementById('carrito');
+    const carritoCount = document.getElementById('carritoCount');
+    
     if (carrito.length === 0) {
-        carritoDiv.innerHTML = '<p class="text-gray-500 text-center">No hay productos en el carrito</p>';
+        carritoDiv.innerHTML = '<p class="text-gray-500 text-center text-sm">No hay productos en el carrito</p>';
+        if (carritoCount) carritoCount.textContent = '0 productos';
         return;
     }
     
+    if (carritoCount) {
+        carritoCount.textContent = carrito.length + ' producto' + (carrito.length !== 1 ? 's' : '');
+    }
+    
     carritoDiv.innerHTML = carrito.map((item, index) => `
-        <div class="flex justify-between items-center border-b pb-2 mb-2">
-            <div>
-                <p class="font-semibold">${item.descripcion}</p>
-                <p class="text-sm text-gray-600">Cantidad: ${item.cantidad} x ${formatearMoneda(item.precioUnitario)}</p>
+        <div class="border-b pb-3 mb-3">
+            <div class="flex justify-between items-start mb-2">
+                <div class="flex-1">
+                    <p class="font-semibold text-sm">${item.descripcion}</p>
+                    <p class="text-xs text-gray-600">${formatearMoneda(item.precioUnitario)}/unidad</p>
+                </div>
+                <button onclick="eliminarDelCarrito(${index})" class="text-red-600 hover:text-red-800 text-lg" title="Eliminar">
+                    <span class="material-icons-outlined text-base">delete</span>
+                </button>
             </div>
-            <button onclick="eliminarDelCarrito(${index})" class="text-red-600 hover:text-red-800">
-                <i class="fas fa-trash"></i>
-            </button>
+            <div class="flex items-center justify-between bg-gray-100 rounded p-2">
+                <div class="flex items-center space-x-2">
+                    <button onclick="disminuirCantidad(${index})" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-sm">−</button>
+                    <span class="px-3 py-1 bg-white rounded border">${item.cantidad}</span>
+                    <button onclick="aumentarCantidad(${index})" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-sm">+</button>
+                </div>
+                <span class="font-semibold text-sm">${formatearMoneda(item.cantidad * item.precioUnitario)}</span>
+            </div>
         </div>
     `).join('');
 }
@@ -160,6 +227,22 @@ function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
     actualizarCarrito();
     calcularTotal();
+}
+
+function aumentarCantidad(index) {
+    if (carrito[index]) {
+        carrito[index].cantidad++;
+        actualizarCarrito();
+        calcularTotal();
+    }
+}
+
+function disminuirCantidad(index) {
+    if (carrito[index] && carrito[index].cantidad > 1) {
+        carrito[index].cantidad--;
+        actualizarCarrito();
+        calcularTotal();
+    }
 }
 
 function calcularTotal() {
@@ -189,18 +272,40 @@ function calcularTotal() {
 async function procesarVenta(event) {
     event.preventDefault();
     
+    console.log('💳 Procesando venta...');
+    console.log('procesarVenta() - Carrito:', carrito);
+    console.log('procesarVenta() - Carrito length:', carrito.length);
+    
+    // VALIDACIÓN 1: Carrito no vacío
     if (carrito.length === 0) {
-        mostrarNotificacion('Agregue productos al carrito', 'error');
+        console.warn('⚠️ Carrito vacío');
+        mostrarNotificacion('❌ Agrega productos al carrito primero', 'error');
         return;
     }
     
-    const habitacionId = document.getElementById('habitacionVenta').value;
-    if (!habitacionId) {
-        mostrarNotificacion('Seleccione una habitación', 'error');
+    // VALIDACIÓN 2: Habitación seleccionada
+    const habitacionSelect = document.getElementById('habitacionVenta');
+    const habitacionId = habitacionSelect ? habitacionSelect.value : '';
+    
+    console.log('Habitación select:', habitacionSelect);
+    console.log('Habitación value:', habitacionId);
+    console.log('Habitación options:', habitacionSelect ? habitacionSelect.options.length : 'N/A');
+    
+    if (!habitacionId || habitacionId === '' || habitacionId === 'undefined') {
+        console.warn('⚠️ Habitación no seleccionada - value:', habitacionId);
+        mostrarNotificacion('❌ Selecciona una Habitación', 'error');
         return;
     }
     
+    // VALIDACIÓN 3: Tipo de pago seleccionado
     const tipoPago = document.getElementById('tipoPago').value;
+    if (!tipoPago || tipoPago === '') {
+        console.warn('⚠️ Tipo de pago no seleccionado');
+        mostrarNotificacion('❌ Selecciona un Tipo de Pago', 'error');
+        return;
+    }
+    
+    console.log('✓ Validaciones pasadas - Habitación:', habitacionId, 'Pago:', tipoPago);
     
     // Calcular totales directamente desde el carrito (sin extraer del DOM)
     let subtotal = 0;
@@ -220,8 +325,16 @@ async function procesarVenta(event) {
     
     const total = subtotal + iva5 + iva10;
     
+    // Obtener fecha actual
+    const hoy = new Date();
+    const fechaVenta = hoy.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+    
+    console.log('Fecha de venta:', fechaVenta);
+    console.log('Total:', total, 'IVA5:', iva5, 'IVA10:', iva10);
+    
     const formData = new URLSearchParams({
         action: 'insertar',
+        fecha: fechaVenta,
         total: total,
         iva5: iva5,
         iva19: iva10, // Usando iva19 para el 10%
@@ -237,15 +350,21 @@ async function procesarVenta(event) {
     });
     
     try {
+        console.log('📤 Enviando venta al servidor...');
+        console.log('FormData:', Object.fromEntries(formData));
+        
         const response = await fetch('ventas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: formData
         });
+        
+        console.log('Response status:', response.status);
         const result = await response.json();
+        console.log('Response result:', result);
         
         if (result.success) {
-            mostrarNotificacion('✓ Venta procesada correctamente');
+            mostrarNotificacion('✅ Venta procesada correctamente');
             carrito = [];
             actualizarCarrito();
             calcularTotal();
@@ -255,11 +374,12 @@ async function procesarVenta(event) {
             console.log('Recargando datos después de venta...');
             await cargarDatos();
         } else {
-            mostrarNotificacion('Error al procesar venta', 'error');
+            console.error('Error en respuesta:', result);
+            mostrarNotificacion('❌ Error: ' + (result.error || 'Error al procesar venta'), 'error');
         }
     } catch (error) {
-        console.error('Error:', error);
-        mostrarNotificacion('Error al procesar venta', 'error');
+        console.error('❌ Error al procesar venta:', error);
+        mostrarNotificacion('❌ Error: ' + error.message, 'error');
     }
 }
 
