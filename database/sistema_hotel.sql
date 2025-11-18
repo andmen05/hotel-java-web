@@ -203,7 +203,22 @@ CREATE TABLE `servicio_habitacion` (
   `total` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+
+
+
+-- Versión simple para desarrollo (password: admin123)
+INSERT INTO proyecto_usuarios (usuario, password, nombre, rol) VALUES 
+('admin', 'admin123', 'Administrador', 'Administrador');
+
+-- Insertar categorías de ejemplo
+INSERT INTO proyecto_categoria (detalle) VALUES 
+('Bebidas'),
+('Comidas'),
+('Snacks'),
+('Postres'),
+('Otros');
+
+
 -- Índices para tablas volcadas
 --
 
