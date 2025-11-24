@@ -15,7 +15,7 @@ Un sistema web integral para la administración completa de operaciones hotelera
 - [Configuración](#-configuración)
 - [Funcionalidades por Página](#-funcionalidades-por-página)
 - [Troubleshooting](#-troubleshooting)
-- [JARs de la captura y cómo cargarlos en NetBeans](#-jars-de-la-captura-y-cómo-cargarlos-en-netbeans)
+- [JARs necesarios y cómo cargarlos en NetBeans](#-jars-necesarios-y-cómo-cargarlos-en-netbeans)
 - [Al bajar desde GitHub: archivos que suelen faltar](#-al-bajar-desde-github-archivos-que-suelen-faltar-y-cómo-resolverlo-en-netbeans)
 - [Soporte](#-soporte)
 - [Autor](#-autor)
