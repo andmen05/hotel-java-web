@@ -32,12 +32,23 @@ function cargarFotoGlobalEnTodoLado() {
             }
         }
         
-        // 2. Actualizar avatar en perfil por ID (más específico)
+        // 2. Actualizar avatar en perfil por ID (sidebar de foto de perfil)
         const avatarPerfil = document.getElementById('avatarPerfil');
         if (avatarPerfil) {
             const img = avatarPerfil.querySelector('img');
             if (!img) {
                 avatarPerfil.innerHTML = `<img src="${fotoPerfil}" alt="Foto de Perfil" class="w-full h-full object-cover">`;
+            } else {
+                img.src = fotoPerfil;
+            }
+        }
+        
+        // 3. Actualizar avatar en el HEADER PRINCIPAL del perfil (el card grande)
+        const avatarPerfilHeader = document.getElementById('avatarPerfilHeader');
+        if (avatarPerfilHeader) {
+            const img = avatarPerfilHeader.querySelector('img');
+            if (!img) {
+                avatarPerfilHeader.innerHTML = `<img src="${fotoPerfil}" alt="Foto de Perfil" class="w-full h-full object-cover rounded-2xl">`;
             } else {
                 img.src = fotoPerfil;
             }
