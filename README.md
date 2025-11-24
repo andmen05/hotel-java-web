@@ -472,6 +472,30 @@ enlaces directos y pasos claros para que NetBeans los use correctamente:
 
 Consejo: durante `File → New Project → Java with Ant → Web Application with Existing Sources`, NetBeans a veces detecta bibliotecas faltantes y ofrece localizarlas o copiarlas al proyecto. Si aparece una advertencia `Missing Libraries`, usa `Resolve Missing Libraries` o añade manualmente desde `Project Properties → Libraries`.
 
+**Nota importante (ubicación correcta de los JARs)**
+
+- La ruta donde deben colocarse los JARs para que el proyecto los incluya al generar el WAR es:
+  - web/WEB-INF/lib/
+- Al compilar/desplegar, cualquier JAR dentro de web/WEB-INF/lib se empaqueta en WEB-INF/lib del WAR y estará disponible en el classpath de la aplicación.
+- Opciones:
+  - Copiarlos directamente a web/WEB-INF/lib (recomendado si no usas Maven/Gradle).
+  - O crear una carpeta lib/ en la raíz del repo y añadir los JARs desde NetBeans (Project Properties → Libraries → Add JAR/Folder → marcar "Copy to Project" si existe).
+
+Comandos (PowerShell) para comprobar y copiar JARs:
+```powershell
+# listar JARs actualmente en web/WEB-INF/lib
+Get-ChildItem -Path .\web\WEB-INF\lib -File -Name
+
+# copiar un JAR descargado al proyecto (ajusta la ruta origen)
+Copy-Item -Path "C:\Users\TuUsuario\Downloads\gson-2.10.1.jar" -Destination ".\web\WEB-INF\lib\"
+
+# después: limpiar y compilar
+ant clean
+ant build
+```
+
+- En NetBeans: Proyecto → clic derecho → Properties → Libraries → Add JAR/Folder → seleccionar los JARs (si aparece opción "Copy to Project", marcarla para que queden dentro del proyecto).
+- Si importas el proyecto y NetBeans muestra "Missing Libraries", usar "Resolve Missing Libraries" y apuntar a la carpeta con los JARs.
 
 
 
