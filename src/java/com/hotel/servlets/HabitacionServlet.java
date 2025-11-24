@@ -59,27 +59,95 @@ public class HabitacionServlet extends HttpServlet {
 
         try {
             if ("insertar".equals(action)) {
+                String idHabitacion = request.getParameter("idHabitacion");
+                String tipoHabitacion = request.getParameter("tipoHabitacion");
+                double precioNoche = Double.parseDouble(request.getParameter("precioNoche"));
+                int capacidad = Integer.parseInt(request.getParameter("capacidad"));
+                
+                // Validaciones
+                if (idHabitacion == null || idHabitacion.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El ID de habitación es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (tipoHabitacion == null || tipoHabitacion.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El tipo de habitación es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioNoche <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de la noche debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (capacidad <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La capacidad debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
                 Habitacion habitacion = new Habitacion();
-                habitacion.setIdHabitacion(request.getParameter("idHabitacion"));
+                habitacion.setIdHabitacion(idHabitacion);
                 habitacion.setEstado(request.getParameter("estado"));
                 String idClienteStr = request.getParameter("idCliente");
                 habitacion.setIdCliente(idClienteStr != null && !idClienteStr.isEmpty() ? Integer.parseInt(idClienteStr) : null);
-                habitacion.setTipoHabitacion(request.getParameter("tipoHabitacion"));
-                habitacion.setPrecioNoche(Double.parseDouble(request.getParameter("precioNoche")));
-                habitacion.setCapacidad(Integer.parseInt(request.getParameter("capacidad")));
+                habitacion.setTipoHabitacion(tipoHabitacion);
+                habitacion.setPrecioNoche(precioNoche);
+                habitacion.setCapacidad(capacidad);
 
                 boolean resultado = habitacionDAO.insertar(habitacion);
                 out.print("{\"success\":" + resultado + "}");
             } else if ("actualizar".equals(action)) {
+                String idHabitacion = request.getParameter("idHabitacion");
+                String tipoHabitacion = request.getParameter("tipoHabitacion");
+                double precioNoche = Double.parseDouble(request.getParameter("precioNoche"));
+                int capacidad = Integer.parseInt(request.getParameter("capacidad"));
+                
+                // Validaciones
+                if (idHabitacion == null || idHabitacion.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El ID de habitación es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (tipoHabitacion == null || tipoHabitacion.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El tipo de habitación es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioNoche <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de la noche debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (capacidad <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La capacidad debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
                 Habitacion habitacion = new Habitacion();
                 habitacion.setId(Integer.parseInt(request.getParameter("id")));
-                habitacion.setIdHabitacion(request.getParameter("idHabitacion"));
+                habitacion.setIdHabitacion(idHabitacion);
                 habitacion.setEstado(request.getParameter("estado"));
                 String idClienteStr = request.getParameter("idCliente");
                 habitacion.setIdCliente(idClienteStr != null && !idClienteStr.isEmpty() ? Integer.parseInt(idClienteStr) : null);
-                habitacion.setTipoHabitacion(request.getParameter("tipoHabitacion"));
-                habitacion.setPrecioNoche(Double.parseDouble(request.getParameter("precioNoche")));
-                habitacion.setCapacidad(Integer.parseInt(request.getParameter("capacidad")));
+                habitacion.setTipoHabitacion(tipoHabitacion);
+                habitacion.setPrecioNoche(precioNoche);
+                habitacion.setCapacidad(capacidad);
 
                 boolean resultado = habitacionDAO.actualizar(habitacion);
                 out.print("{\"success\":" + resultado + "}");
@@ -87,6 +155,9 @@ public class HabitacionServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"error\":\"Acción no válida\"}");
             }
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"success\":false, \"error\":\"Formato de datos inválido: " + e.getMessage() + "\"}");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\":\"" + e.getMessage() + "\"}");

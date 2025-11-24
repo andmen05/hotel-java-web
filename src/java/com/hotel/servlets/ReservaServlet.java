@@ -57,25 +57,80 @@ public class ReservaServlet extends HttpServlet {
 
         try {
             if ("insertar".equals(action)) {
+                // Validar parámetros requeridos
+                String idClienteStr = request.getParameter("idCliente");
+                String habitacionStr = request.getParameter("habitacion");
+                String fechaEntradaStr = request.getParameter("fechaEntrada");
+                String fechaSalidaStr = request.getParameter("fechaSalida");
+                String tipoReserva = request.getParameter("tipoReserva");
+                String estado = request.getParameter("estado");
+                
+                if (idClienteStr == null || habitacionStr == null || fechaEntradaStr == null || 
+                    fechaSalidaStr == null || tipoReserva == null || estado == null) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"Parámetros requeridos faltantes\"}");
+                    out.flush();
+                    return;
+                }
+                
+                Date fechaEntrada = Date.valueOf(fechaEntradaStr);
+                Date fechaSalida = Date.valueOf(fechaSalidaStr);
+                
+                // Validar que fechaSalida > fechaEntrada
+                if (!fechaSalida.after(fechaEntrada)) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La fecha de salida debe ser posterior a la fecha de entrada\"}");
+                    out.flush();
+                    return;
+                }
+                
                 Reserva reserva = new Reserva();
-                reserva.setIdCliente(Integer.parseInt(request.getParameter("idCliente")));
-                reserva.setHabitacion(Integer.parseInt(request.getParameter("habitacion")));
-                reserva.setFechaEntrada(Date.valueOf(request.getParameter("fechaEntrada")));
-                reserva.setFechaSalida(Date.valueOf(request.getParameter("fechaSalida")));
-                reserva.setTipoReserva(request.getParameter("tipoReserva"));
-                reserva.setEstado(request.getParameter("estado"));
+                reserva.setIdCliente(Integer.parseInt(idClienteStr));
+                reserva.setHabitacion(Integer.parseInt(habitacionStr));
+                reserva.setFechaEntrada(fechaEntrada);
+                reserva.setFechaSalida(fechaSalida);
+                reserva.setTipoReserva(tipoReserva);
+                reserva.setEstado(estado);
 
                 boolean resultado = reservaDAO.insertar(reserva);
                 out.print("{\"success\":" + resultado + "}");
             } else if ("actualizar".equals(action)) {
+                // Validar parámetros requeridos
+                String idStr = request.getParameter("id");
+                String idClienteStr = request.getParameter("idCliente");
+                String habitacionStr = request.getParameter("habitacion");
+                String fechaEntradaStr = request.getParameter("fechaEntrada");
+                String fechaSalidaStr = request.getParameter("fechaSalida");
+                String tipoReserva = request.getParameter("tipoReserva");
+                String estado = request.getParameter("estado");
+                
+                if (idStr == null || idClienteStr == null || habitacionStr == null || fechaEntradaStr == null || 
+                    fechaSalidaStr == null || tipoReserva == null || estado == null) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"Parámetros requeridos faltantes\"}");
+                    out.flush();
+                    return;
+                }
+                
+                Date fechaEntrada = Date.valueOf(fechaEntradaStr);
+                Date fechaSalida = Date.valueOf(fechaSalidaStr);
+                
+                // Validar que fechaSalida > fechaEntrada
+                if (!fechaSalida.after(fechaEntrada)) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La fecha de salida debe ser posterior a la fecha de entrada\"}");
+                    out.flush();
+                    return;
+                }
+                
                 Reserva reserva = new Reserva();
-                reserva.setId(Integer.parseInt(request.getParameter("id")));
-                reserva.setIdCliente(Integer.parseInt(request.getParameter("idCliente")));
-                reserva.setHabitacion(Integer.parseInt(request.getParameter("habitacion")));
-                reserva.setFechaEntrada(Date.valueOf(request.getParameter("fechaEntrada")));
-                reserva.setFechaSalida(Date.valueOf(request.getParameter("fechaSalida")));
-                reserva.setTipoReserva(request.getParameter("tipoReserva"));
-                reserva.setEstado(request.getParameter("estado"));
+                reserva.setId(Integer.parseInt(idStr));
+                reserva.setIdCliente(Integer.parseInt(idClienteStr));
+                reserva.setHabitacion(Integer.parseInt(habitacionStr));
+                reserva.setFechaEntrada(fechaEntrada);
+                reserva.setFechaSalida(fechaSalida);
+                reserva.setTipoReserva(tipoReserva);
+                reserva.setEstado(estado);
 
                 boolean resultado = reservaDAO.actualizar(reserva);
                 out.print("{\"success\":" + resultado + "}");
@@ -83,6 +138,12 @@ public class ReservaServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"error\":\"Acción no válida\"}");
             }
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"success\":false, \"error\":\"Formato de datos inválido: " + e.getMessage() + "\"}");
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"success\":false, \"error\":\"Formato de fecha inválido. Use YYYY-MM-DD\"}");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\":\"" + e.getMessage() + "\"}");

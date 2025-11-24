@@ -4,6 +4,7 @@ let productos = [];
 let habitaciones = [];
 let ventas = [];
 let carrito = [];
+let checkinsActivos = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Ventas - Inicializando...');
@@ -24,6 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Actualizar grid cards cada 5 segundos
     setInterval(actualizarGridCards, 5000);
+    
+    // Actualizar check-ins activos cada 5 segundos
+    setInterval(async () => {
+        try {
+            checkinsActivos = await fetchData('checkin?action=activos') || [];
+            console.log('✓ Check-ins activos actualizados:', checkinsActivos.length);
+        } catch (e) {
+            console.warn('⚠️ Error actualizando check-ins activos:', e.message);
+        }
+    }, 5000);
 });
 
 async function cargarDatos() {
@@ -42,13 +53,19 @@ async function cargarDatos() {
             console.error('Error ventas:', e); 
             return []; 
         });
+        const checkinsData = await fetchData('checkin?action=activos').catch(e => { 
+            console.error('Error check-ins activos:', e); 
+            return []; 
+        });
         
         productos = productosData || [];
         habitaciones = habitacionesData || [];
         ventas = ventasData || [];
+        checkinsActivos = checkinsData || [];
         
-        console.log('✓ Datos cargados:', { productos: productos.length, habitaciones: habitaciones.length, ventas: ventas.length });
+        console.log('✓ Datos cargados:', { productos: productos.length, habitaciones: habitaciones.length, ventas: ventas.length, checkinsActivos: checkinsActivos.length });
         console.log('Productos:', productos);
+        console.log('Check-ins Activos:', checkinsActivos);
         
         // Actualizar grid cards
         actualizarGridCards();
@@ -165,6 +182,20 @@ function agregarProducto() {
     console.log('Producto encontrado:', producto);
     if (!producto) {
         mostrarNotificacion('❌ Producto no encontrado', 'error');
+        return;
+    }
+    
+    // VALIDACIÓN: Verificar stock disponible
+    const stockDisponible = producto.existencia || 0;
+    console.log('Stock disponible:', stockDisponible, 'Cantidad solicitada:', cantidad);
+    
+    if (cantidad > stockDisponible) {
+        mostrarNotificacion(`❌ Stock insuficiente. Disponible: ${stockDisponible} unidades, Solicitado: ${cantidad}`, 'error');
+        return;
+    }
+    
+    if (stockDisponible <= 0) {
+        mostrarNotificacion('❌ Producto sin stock disponible', 'error');
         return;
     }
     
@@ -307,6 +338,20 @@ async function procesarVenta(event) {
     
     console.log('✓ Validaciones pasadas - Habitación:', habitacionId, 'Pago:', tipoPago);
     
+    // OBTENER ID DEL CLIENTE: Buscar en los check-ins activos
+    const checkinActivo = checkinsActivos.find(ci => ci.habitacion == habitacionId);
+    const idCliente = checkinActivo ? checkinActivo.idCliente : null;
+    
+    console.log('Check-in activo encontrado:', checkinActivo);
+    console.log('ID Cliente del check-in:', idCliente);
+    
+    // VALIDACIÓN 4: Habitación debe estar ocupada (tener cliente con check-in activo)
+    if (!idCliente) {
+        console.warn('⚠️ Habitación no ocupada - No hay clientes con check-in activo');
+        mostrarNotificacion('❌ La habitación debe estar ocupada para registrar una venta. No hay huéspedes', 'error');
+        return;
+    }
+    
     // Calcular totales directamente desde el carrito (sin extraer del DOM)
     let subtotal = 0;
     let iva5 = 0;
@@ -340,6 +385,7 @@ async function procesarVenta(event) {
         iva19: iva10, // Usando iva19 para el 10%
         exento: 0,
         tipoPago: tipoPago,
+        idCliente: idCliente || '',
         idHabitacion: habitacionId,
         tipoVenta: 'Habitacion',
         productos: JSON.stringify(carrito.map(item => ({

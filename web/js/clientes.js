@@ -72,12 +72,15 @@ async function cargarDatos() {
             habitacionesCount: habitaciones.length 
         });
         
+        // DEBUG: Ver estados de reservas
+        console.log('Estados de reservas:', reservas.map(r => ({ id: r.id, estado: r.estado, idCliente: r.idCliente })));
+        
         // Calcular estadísticas
         const totalClientes = clientes.length;
         
-        // Clientes activos (con reservas confirmadas)
+        // Clientes activos (con reservas finalizadas)
         const clientesActivos = new Set(
-            reservas.filter(r => r.estado === 'Confirmada').map(r => r.idCliente)
+            reservas.filter(r => r.estado === 'Finalizada').map(r => r.idCliente)
         ).size;
         
         // Nuevos este mes - como no tenemos created_at en el modelo, 
@@ -102,7 +105,7 @@ async function cargarDatos() {
         
         // Ingresos totales - calcular basándose en noches * precio_noche
         const ingresosTotales = reservas
-            .filter(r => r.estado === 'Confirmada')
+            .filter(r => r.estado === 'Finalizada')
             .reduce((sum, r) => {
                 const habitacion = habitaciones.find(h => h.id === r.habitacion);
                 if (!habitacion) return sum;
@@ -399,10 +402,13 @@ function renderizarTabla() {
         
         // Calcular total gastado - basándose en noches * precio_noche
         const totalGastado = reservas
-            .filter(r => r.idCliente === c.id && r.estado === 'Confirmada')
+            .filter(r => r.idCliente === c.id && r.estado === 'Finalizada')
             .reduce((sum, r) => {
                 const habitacion = habitaciones.find(h => h.id === r.habitacion);
-                if (!habitacion) return sum;
+                if (!habitacion) {
+                    console.warn('Habitación no encontrada para reserva:', r);
+                    return sum;
+                }
                 
                 const fechaEntrada = new Date(r.fechaEntrada);
                 const fechaSalida = new Date(r.fechaSalida);
@@ -410,11 +416,13 @@ function renderizarTabla() {
                 const precioNoche = habitacion.precioNoche || 0;
                 const totalReserva = noches * precioNoche;
                 
+                console.log(`Cliente ${c.id}: Reserva ${r.id}, Noches: ${noches}, Precio/noche: ${precioNoche}, Total: ${totalReserva}`);
+                
                 return sum + totalReserva;
             }, 0);
         
         // Determinar si está activo
-        const esActivo = reservas.some(r => r.idCliente === c.id && r.estado === 'Confirmada');
+        const esActivo = reservas.some(r => r.idCliente === c.id && r.estado === 'Finalizada');
         const estadoBadge = esActivo 
             ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded font-semibold">Activo</span>'
             : '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded font-semibold">Inactivo</span>';

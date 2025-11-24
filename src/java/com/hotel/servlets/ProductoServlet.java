@@ -64,13 +64,62 @@ public class ProductoServlet extends HttpServlet {
 
         try {
             if ("insertar".equals(action)) {
+                String codigo = request.getParameter("codigo");
+                String descripcion = request.getParameter("descripcion");
+                double precioVenta = Double.parseDouble(request.getParameter("precioVenta"));
+                double precioCompra = Double.parseDouble(request.getParameter("precioCompra"));
+                int existencia = Integer.parseInt(request.getParameter("existencia"));
+                
+                // Validaciones
+                if (codigo == null || codigo.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El código del producto es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (descripcion == null || descripcion.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La descripción del producto es requerida\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioVenta <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de venta debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioCompra <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de compra debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioVenta <= precioCompra) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de venta debe ser mayor al precio de compra\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (existencia < 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La existencia no puede ser negativa\"}");
+                    out.flush();
+                    return;
+                }
+                
                 Producto producto = new Producto();
-                producto.setCodigo(request.getParameter("codigo"));
-                producto.setDescripcion(request.getParameter("descripcion"));
-                producto.setPrecioVenta(Double.parseDouble(request.getParameter("precioVenta")));
-                producto.setPrecioCompra(Double.parseDouble(request.getParameter("precioCompra")));
+                producto.setCodigo(codigo);
+                producto.setDescripcion(descripcion);
+                producto.setPrecioVenta(precioVenta);
+                producto.setPrecioCompra(precioCompra);
                 producto.setIva(Integer.parseInt(request.getParameter("iva")));
-                producto.setExistencia(Integer.parseInt(request.getParameter("existencia")));
+                producto.setExistencia(existencia);
                 producto.setIdUsuario(Long.parseLong(request.getParameter("idUsuario")));
                 producto.setCodCategoria(Integer.parseInt(request.getParameter("codCategoria")));
                 String vencimientoStr = request.getParameter("vencimiento");
@@ -88,14 +137,63 @@ public class ProductoServlet extends HttpServlet {
                 boolean resultado = productoDAO.insertar(producto);
                 out.print("{\"success\":" + resultado + "}");
             } else if ("actualizar".equals(action)) {
+                String codigo = request.getParameter("codigo");
+                String descripcion = request.getParameter("descripcion");
+                double precioVenta = Double.parseDouble(request.getParameter("precioVenta"));
+                double precioCompra = Double.parseDouble(request.getParameter("precioCompra"));
+                int existencia = Integer.parseInt(request.getParameter("existencia"));
+                
+                // Validaciones
+                if (codigo == null || codigo.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El código del producto es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (descripcion == null || descripcion.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La descripción del producto es requerida\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioVenta <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de venta debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioCompra <= 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de compra debe ser mayor a 0\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (precioVenta <= precioCompra) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"El precio de venta debe ser mayor al precio de compra\"}");
+                    out.flush();
+                    return;
+                }
+                
+                if (existencia < 0) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"La existencia no puede ser negativa\"}");
+                    out.flush();
+                    return;
+                }
+                
                 Producto producto = new Producto();
                 producto.setId(Long.parseLong(request.getParameter("id")));
-                producto.setCodigo(request.getParameter("codigo"));
-                producto.setDescripcion(request.getParameter("descripcion"));
-                producto.setPrecioVenta(Double.parseDouble(request.getParameter("precioVenta")));
-                producto.setPrecioCompra(Double.parseDouble(request.getParameter("precioCompra")));
+                producto.setCodigo(codigo);
+                producto.setDescripcion(descripcion);
+                producto.setPrecioVenta(precioVenta);
+                producto.setPrecioCompra(precioCompra);
                 producto.setIva(Integer.parseInt(request.getParameter("iva")));
-                producto.setExistencia(Integer.parseInt(request.getParameter("existencia")));
+                producto.setExistencia(existencia);
                 producto.setIdUsuario(Long.parseLong(request.getParameter("idUsuario")));
                 producto.setCodCategoria(Integer.parseInt(request.getParameter("codCategoria")));
                 String vencimientoStr = request.getParameter("vencimiento");
@@ -112,10 +210,25 @@ public class ProductoServlet extends HttpServlet {
 
                 boolean resultado = productoDAO.actualizar(producto);
                 out.print("{\"success\":" + resultado + "}");
+            } else if ("eliminar".equals(action)) {
+                String idParam = request.getParameter("id");
+                
+                if (idParam == null || idParam.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"success\":false, \"error\":\"ID del producto es requerido\"}");
+                    out.flush();
+                    return;
+                }
+                
+                boolean resultado = productoDAO.eliminar(Long.parseLong(idParam));
+                out.print("{\"success\":" + resultado + "}");
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"error\":\"Acción no válida\"}");
             }
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"success\":false, \"error\":\"Formato de datos inválido: " + e.getMessage() + "\"}");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\":\"" + e.getMessage() + "\"}");

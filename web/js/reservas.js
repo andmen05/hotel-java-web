@@ -82,8 +82,29 @@ async function cargarDatos() {
         const totalHabitaciones = habitaciones.length || 1;
         const ocupacionPorcentaje = Math.round((ocupadasHoy / totalHabitaciones) * 100);
         
-        // Ingresos proyectados (reservas confirmadas)
-        const ingresosProyectados = confirmadas * 150; // Promedio por noche
+        // Ingresos proyectados - calcular basándose en reservas confirmadas del mes actual
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+        
+        const reservasConfirmadasMes = reservas.filter(r => {
+            if (r.estado !== 'Confirmada') return false;
+            const fechaEntrada = new Date(r.fechaEntrada);
+            fechaEntrada.setHours(0, 0, 0, 0);
+            return fechaEntrada >= inicioMes && fechaEntrada <= finMes;
+        });
+        
+        const ingresosProyectados = reservasConfirmadasMes.reduce((sum, r) => {
+            const habitacion = habitaciones.find(h => h.id === r.habitacion);
+            if (!habitacion) return sum;
+            
+            const fechaEntrada = new Date(r.fechaEntrada);
+            const fechaSalida = new Date(r.fechaSalida);
+            const noches = Math.ceil((fechaSalida - fechaEntrada) / (1000 * 60 * 60 * 24));
+            const precioNoche = habitacion.precioNoche || 0;
+            const totalReserva = noches * precioNoche;
+            
+            return sum + totalReserva;
+        }, 0);
         
         // Actualizar tarjetas de resumen
         const totalEl = document.getElementById('totalReservas');

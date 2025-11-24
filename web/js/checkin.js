@@ -404,6 +404,35 @@ async function guardarCheckIn(event) {
         return;
     }
     
+    // VALIDACIÓN 5: Verificar que la habitación NO esté ocupada por otro cliente
+    const habitacionOcupada = checkIns.some(ci => ci.habitacion == habitacion);
+    
+    if (habitacionOcupada) {
+        mostrarNotificacion('❌ La habitación ya está ocupada por otro huésped. No se pueden hacer dos check-ins en la misma habitación', 'error');
+        return;
+    }
+    
+    // VALIDACIÓN 6: Verificar que NO haya otra reserva confirmada para la misma habitación en las mismas fechas
+    const fechaIngresoObj = new Date(fechaIngreso);
+    fechaIngresoObj.setHours(0, 0, 0, 0);
+    
+    const reservaConflictiva = reservas.some(r => {
+        if (r.habitacion != habitacion || r.estado !== 'Confirmada' || r.idCliente == idCliente) {
+            return false; // No es conflictiva
+        }
+        
+        const fechaEntradaReserva = new Date(r.fechaEntrada);
+        fechaEntradaReserva.setHours(0, 0, 0, 0);
+        
+        // Verificar si la fecha de entrada coincide
+        return fechaEntradaReserva.getTime() === fechaIngresoObj.getTime();
+    });
+    
+    if (reservaConflictiva) {
+        mostrarNotificacion('❌ Ya existe otra reserva confirmada para esta habitación en la misma fecha. No se pueden hacer dos check-ins simultáneos', 'error');
+        return;
+    }
+    
     console.log('✓ Registrando check-in:', { idCliente, habitacion, fechaIngreso, noches });
     
     const formData = new URLSearchParams({

@@ -115,8 +115,15 @@ public class CheckInServlet extends HttpServlet {
                 
                 if (resultado && checkIn != null) {
                     try {
-                        // Obtener ventas de la habitación
-                        List<Venta> ventas = ventaDAO.listarPorHabitacion(checkIn.getHabitacion());
+                        // Obtener ventas de la habitación FILTRADAS por cliente actual
+                        List<Venta> ventasHabitacion = ventaDAO.listarPorHabitacion(checkIn.getHabitacion());
+                        // Filtrar solo las ventas del cliente actual
+                        List<Venta> ventas = new ArrayList<>();
+                        for (Venta v : ventasHabitacion) {
+                            if (v.getIdCliente() != null && v.getIdCliente().equals(checkIn.getIdCliente())) {
+                                ventas.add(v);
+                            }
+                        }
                         responseData.put("ventas", ventas);
                         responseData.put("checkIn", checkIn);
                     } catch (Exception e) {

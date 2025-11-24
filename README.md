@@ -15,6 +15,8 @@ Un sistema web integral para la administración completa de operaciones hotelera
 - [Configuración](#-configuración)
 - [Funcionalidades por Página](#-funcionalidades-por-página)
 - [Troubleshooting](#-troubleshooting)
+- [JARs de la captura y cómo cargarlos en NetBeans](#-jars-de-la-captura-y-cómo-cargarlos-en-netbeans)
+- [Al bajar desde GitHub: archivos que suelen faltar](#-al-bajar-desde-github-archivos-que-suelen-faltar-y-cómo-resolverlo-en-netbeans)
 - [Soporte](#-soporte)
 - [Autor](#-autor)
 
@@ -232,7 +234,9 @@ hotel-java-web/
 │
 ├── web/                            # Archivos web
 │   ├── index.jsp                   # Página de login
+
 │   ├── dashboard.jsp               # Panel principal
+
 │   ├── clientes.jsp                # Gestión de clientes
 │   ├── habitaciones.jsp            # Gestión de habitaciones
 │   ├── reservas.jsp                # Gestión de reservas
@@ -445,6 +449,52 @@ private static final String PASSWORD = "";      // Agregar si existe
 
 
 ---
+
+## 📥 JARs para el funcionamiento del proyecto y cómo cargarlos en NetBeans
+
+enlaces directos y pasos claros para que NetBeans los use correctamente:
+
+- Enlaces de descarga:
+  - `gson-2.10.1.jar` (Maven Central):
+    - Página: https://repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/
+    - JAR directo: https://repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar
+  - `jbcrypt-0.4.jar` (Maven Central):
+    - Página: https://repo1.maven.org/maven2/org/mindrot/jbcrypt/0.4/
+    - JAR directo: https://repo1.maven.org/maven2/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar
+
+
+1. Abre el proyecto en NetBeans.
+2. En `Projects`, clic derecho sobre el proyecto → `Properties`.
+3. Selecciona `Libraries`.
+4. Pulsa `Add JAR/Folder` y selecciona los JARs descargados.
+5. Si NetBeans muestra una casilla para "Copy to Project" o similar, márcala para que los JARs queden dentro del proyecto. Si no aparece esa opción, copia manualmente los JARs a `web/WEB-INF/lib` (ver pasos anteriores).
+6. Haz `Clean and Build` para verificar que el WAR resultante incluye los JARs en `WEB-INF/lib`.
+
+Consejo: durante `File → New Project → Java with Ant → Web Application with Existing Sources`, NetBeans a veces detecta bibliotecas faltantes y ofrece localizarlas o copiarlas al proyecto. Si aparece una advertencia `Missing Libraries`, usa `Resolve Missing Libraries` o añade manualmente desde `Project Properties → Libraries`.
+
+
+
+
+## ⚠️ Al bajar desde GitHub: archivos que suelen faltar y cómo resolverlo en NetBeans
+
+Cuando clonas el repositorio desde GitHub muchas veces faltan archivos o recursos que NetBeans y el despliegue esperan. 
+
+1. Clona el repo y entra en la carpeta:
+
+```powershell
+git clone https://github.com/andmen05/hotel-java-web.git
+cd hotel-java-web
+```
+
+2. Descargar y copiar JARs esenciales a `web/WEB-INF/lib` (si no están): `gson-2.10.1.jar`, `mysql-connector-java-<versión>.jar`, `jbcrypt-0.4.jar` (opcional).
+
+3. Abrir NetBeans → `File → Open Project` o `New Project → Web Application with Existing Sources` y seleccionar la carpeta.
+
+4. Si NetBeans muestra `Missing Libraries`, usar `Resolve Missing Libraries` o `Project Properties → Libraries → Add JAR/Folder` y marcar "Copy to Project" si existe.
+
+5. Configurar servidor y JDK en NetBeans si pide: `Tools → Servers` (añadir Tomcat) y `Tools → Java Platforms` (seleccionar JDK instalado). Luego en `Project Properties → Run` asignar el servidor.
+
+6. Ejecutar `Clean and Build` y luego `Run` desde NetBeans. Verificar en `http://localhost:8080/<context>`.
 
 
 ## 📞 Soporte

@@ -101,7 +101,7 @@ async function cargarDatos() {
         const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
         
         const reservasDelMes = reservas.filter(r => {
-            if (r.estado !== 'Confirmada') return false;
+            if (r.estado !== 'Finalizada') return false;
             const fechaEntrada = new Date(r.fechaEntrada);
             fechaEntrada.setHours(0, 0, 0, 0);
             return fechaEntrada >= inicioMes && fechaEntrada <= finMes;
